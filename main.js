@@ -22,32 +22,22 @@ minHeight:600,
 
 backgroundColor:"#0f172a",
 
-// ÍCONE DO NAVEGADOR
 icon: path.join(__dirname,"assets/logo.png"),
 
 webPreferences:{
-
 preload: path.join(__dirname,"preload.js"),
-
 nodeIntegration:false,
 contextIsolation:true,
-
 webviewTag:true,
 
-// melhorar performance
 sandbox:true,
 enableBlinkFeatures:"OverlayScrollbars"
-
 }
 
 })
 
-
-// carregar interface
 mainWindow.loadFile("index.html")
 
-
-// abrir links externos no navegador padrão
 mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 
 shell.openExternal(url)
@@ -56,12 +46,8 @@ return { action:"deny" }
 
 })
 
-
-// remover menu padrão
 mainWindow.setMenu(null)
 
-
-// otimizar memória
 mainWindow.webContents.on("did-finish-load",()=>{
 
 mainWindow.webContents.setZoomFactor(1)
@@ -78,19 +64,24 @@ mainWindow.webContents.setZoomFactor(1)
 app.whenReady().then(()=>{
 
 try{
-
 enableAdBlock()
-
 }catch(err){
-
 console.error("Erro ao iniciar AdBlock:",err)
-
 }
+
+// SEGURANÇA DE DOWNLOAD
+session.defaultSession.on("will-download",(event,item)=>{
+
+const url = item.getURL()
+
+if(url.includes(".exe") || url.includes(".bat")){
+console.warn("Download potencialmente perigoso:",url)
+}
+
+})
 
 createWindow()
 
-
-// comportamento macOS
 app.on("activate",()=>{
 
 if(BrowserWindow.getAllWindows().length === 0){
@@ -110,23 +101,6 @@ app.on("window-all-closed",()=>{
 
 if(process.platform !== "darwin"){
 app.quit()
-}
-
-})
-
-
-// ===============================
-// SEGURANÇA EXTRA
-// ===============================
-
-session.defaultSession.on("will-download",(event,item)=>{
-
-const url = item.getURL()
-
-if(url.includes(".exe") || url.includes(".bat")){
-
-console.warn("Download potencialmente perigoso detectado:",url)
-
 }
 
 })
