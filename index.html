@@ -18,7 +18,18 @@
 
 <div class="topbar">
 
-<div class="nav-left">
+<!-- navegação -->
+
+<div class="nav-controls">
+
+<button id="btnVoltar">⬅</button>
+<button id="btnAvancar">➡</button>
+<button id="btnRecarregar">🔄</button>
+
+</div>
+
+
+<!-- barra de endereço -->
 
 <input
 id="url"
@@ -27,29 +38,23 @@ placeholder="Pesquisar ou digitar URL"
 autocomplete="off"
 />
 
-</div>
+
+<!-- botões extras -->
 
 <div class="nav-buttons">
 
-<button id="btnIr" class="btn-primary">
-🌐 Ir
-</button>
+<button id="btnIr">🌐 Ir</button>
 
-<button id="btnIA" class="btn-secondary">
-🤖 IA
-</button>
+<button id="btnIA">🤖 IA</button>
 
-<button id="btnEstudo" class="btn-secondary">
-📖 Modo Estudo
-</button>
+<button id="btnEstudo">📖 Estudo</button>
 
-<button id="btnNovaAba" class="btn-newtab">
-＋ Nova Aba
-</button>
+<button id="btnNovaAba">＋ Nova Aba</button>
 
 </div>
 
 </div>
+
 
 <!-- ===================== -->
 <!-- ABAS -->
@@ -57,11 +62,13 @@ autocomplete="off"
 
 <div id="tabs"></div>
 
+
 <!-- ===================== -->
-<!-- ÁREA DO NAVEGADOR -->
+<!-- NAVEGADOR -->
 <!-- ===================== -->
 
 <div id="browser-container"></div>
+
 
 <!-- ===================== -->
 <!-- SCRIPTS -->
@@ -77,41 +84,122 @@ autocomplete="off"
 window.addEventListener("DOMContentLoaded", () => {
 
 const urlBar = document.getElementById("url")
+
 const btnIr = document.getElementById("btnIr")
 const btnNovaAba = document.getElementById("btnNovaAba")
+
 const btnIA = document.getElementById("btnIA")
 const btnEstudo = document.getElementById("btnEstudo")
+
+const btnVoltar = document.getElementById("btnVoltar")
+const btnAvancar = document.getElementById("btnAvancar")
+const btnRecarregar = document.getElementById("btnRecarregar")
+
 
 // primeira aba
 novaAba("https://www.google.com")
 
-// botão IR
+
+// ====================
+// NAVEGAR
+// ====================
+
 btnIr.addEventListener("click", navegar)
 
-// botão NOVA ABA
-btnNovaAba.addEventListener("click", () => {
-novaAba("https://www.google.com")
-})
 
-// botão IA
-btnIA.addEventListener("click", () => {
-if(typeof resumir === "function"){
-resumir()
-}
-})
-
-// botão modo estudo
-btnEstudo.addEventListener("click", () => {
-if(typeof modoEstudo === "function"){
-modoEstudo()
-}
-})
-
-// ENTER na barra
-urlBar.addEventListener("keydown", (e) => {
+// ENTER
+urlBar.addEventListener("keydown",(e)=>{
 
 if(e.key === "Enter"){
+
 navegar()
+
+}
+
+})
+
+
+// ====================
+// NOVA ABA
+// ====================
+
+btnNovaAba.addEventListener("click", ()=>{
+
+novaAba("https://www.google.com")
+
+})
+
+
+// ====================
+// IA
+// ====================
+
+btnIA.addEventListener("click", ()=>{
+
+if(typeof resumir === "function"){
+
+resumir()
+
+}
+
+})
+
+
+// ====================
+// MODO ESTUDO
+// ====================
+
+btnEstudo.addEventListener("click", ()=>{
+
+if(typeof modoEstudo === "function"){
+
+modoEstudo()
+
+}
+
+})
+
+
+// ====================
+// VOLTAR
+// ====================
+
+btnVoltar.addEventListener("click", ()=>{
+
+if(abaAtual && abaAtual.webview){
+
+abaAtual.webview.goBack()
+
+}
+
+})
+
+
+// ====================
+// AVANÇAR
+// ====================
+
+btnAvancar.addEventListener("click", ()=>{
+
+if(abaAtual && abaAtual.webview){
+
+abaAtual.webview.goForward()
+
+}
+
+})
+
+
+// ====================
+// RECARREGAR
+// ====================
+
+btnRecarregar.addEventListener("click", ()=>{
+
+if(abaAtual && abaAtual.webview){
+
+abaAtual.webview.reload()
+
 }
 
 })
