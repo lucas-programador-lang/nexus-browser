@@ -1,6 +1,11 @@
 let abas = []
 let abaAtual = null
 
+
+// ===============================
+// NOVA ABA
+// ===============================
+
 function novaAba(url = "https://www.google.com") {
 
 const browserContainer = document.getElementById("browser-container")
@@ -13,20 +18,34 @@ const tabButton = document.createElement("div")
 tabButton.className = "tab"
 tabButton.id = id
 
-// título
+
+// ícone do site
+const icon = document.createElement("img")
+icon.src = "https://www.google.com/favicon.ico"
+icon.width = 16
+icon.height = 16
+
+
+// título da aba
 const titulo = document.createElement("span")
 titulo.innerText = "Nova Aba"
 
+
 // botão fechar
 const fechar = document.createElement("span")
-fechar.innerText = " ✕"
+fechar.innerText = "✕"
 fechar.className = "close-tab"
 
 fechar.onclick = (e) => {
+
 e.stopPropagation()
 fecharAba(id)
+
 }
 
+
+// montar aba
+tabButton.appendChild(icon)
 tabButton.appendChild(titulo)
 tabButton.appendChild(fechar)
 
@@ -34,7 +53,11 @@ tabButton.onclick = () => trocarAba(id)
 
 tabsContainer.appendChild(tabButton)
 
-// criar webview
+
+// ===============================
+// WEBVIEW
+// ===============================
+
 const webview = document.createElement("webview")
 
 webview.src = url
@@ -44,40 +67,79 @@ webview.style.display = "none"
 
 webview.id = "view-" + id
 
-// atualizar título da aba
+
+// atualizar título
 webview.addEventListener("page-title-updated", (e) => {
-titulo.innerText = e.title.substring(0, 25)
+
+titulo.innerText = e.title.substring(0, 20)
+
 })
+
+
+// atualizar favicon
+webview.addEventListener("page-favicon-updated", (e) => {
+
+if(e.favicons && e.favicons.length){
+
+icon.src = e.favicons[0]
+
+}
+
+})
+
 
 // atualizar barra de URL
 webview.addEventListener("did-navigate", () => {
+
 const urlBar = document.getElementById("url")
-if (urlBar) {
+
+if (urlBar && abaAtual && abaAtual.webview === webview) {
+
 urlBar.value = webview.getURL()
+
 }
+
 })
 
-// atualizar URL quando carregar
+
+// página carregou
 webview.addEventListener("did-finish-load", () => {
+
 const urlBar = document.getElementById("url")
+
 if (urlBar && abaAtual && abaAtual.webview === webview) {
+
 urlBar.value = webview.getURL()
+
 }
+
 })
+
 
 browserContainer.appendChild(webview)
 
+
+// salvar aba
 abas.push({
+
 id: id,
 botao: tabButton,
 webview: webview
+
 })
 
+
+// ativar aba
 trocarAba(id)
 
 }
 
-// trocar aba
+
+
+// ===============================
+// TROCAR ABA
+// ===============================
+
 function trocarAba(id) {
 
 abas.forEach(tab => {
@@ -97,15 +159,23 @@ aba.botao.classList.add("active-tab")
 abaAtual = aba
 
 const urlBar = document.getElementById("url")
+
 if (urlBar) {
+
 urlBar.value = aba.webview.getURL() || ""
-}
 
 }
 
 }
 
-// fechar aba
+}
+
+
+
+// ===============================
+// FECHAR ABA
+// ===============================
+
 function fecharAba(id) {
 
 const index = abas.findIndex(t => t.id === id)
@@ -119,11 +189,16 @@ aba.botao.remove()
 
 abas.splice(index, 1)
 
-// abrir outra aba automaticamente
+
+// abrir outra aba
 if (abas.length > 0) {
+
 trocarAba(abas[Math.max(0, index - 1)].id)
+
 } else {
+
 novaAba("https://www.google.com")
+
 }
 
 }
