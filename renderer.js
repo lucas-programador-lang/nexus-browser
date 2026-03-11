@@ -1,10 +1,33 @@
 // ===============================
+// CACHE DOM (melhor performance)
+// ===============================
+
+let urlBar = null
+
+window.addEventListener("DOMContentLoaded", () => {
+
+urlBar = document.getElementById("url")
+
+if(urlBar){
+
+urlBar.addEventListener("keydown",(e)=>{
+
+if(e.key === "Enter"){
+navegar()
+}
+
+})
+
+}
+
+})
+
+
+// ===============================
 // NAVEGAR
 // ===============================
 
 function navegar(){
-
-const urlBar = document.getElementById("url")
 
 if(!urlBar) return
 
@@ -41,26 +64,30 @@ urlInput = "https://" + urlInput
 
 
 // -------------------------------
-// VERIFICAR SEGURANÇA
+// VERIFICAÇÃO DE SEGURANÇA
 // -------------------------------
 
 if(typeof verificarSite === "function"){
-
 verificarSite(urlInput)
-
 }
 
 
 // -------------------------------
-// VERIFICAR ABA ATIVA
+// VERIFICAR ABA
 // -------------------------------
 
 if(!abaAtual || !abaAtual.webview){
-
 console.warn("Nenhuma aba ativa")
-
 return
+}
 
+
+// -------------------------------
+// CACHE SIMPLES DE NAVEGAÇÃO
+// -------------------------------
+
+if(abaAtual.webview.getURL() === urlInput){
+return
 }
 
 
@@ -68,7 +95,7 @@ return
 // NAVEGAR
 // -------------------------------
 
-abaAtual.webview.loadURL(urlInput)
+abaAtual.webview.src = urlInput
 
 }
 
@@ -81,13 +108,11 @@ function atualizarBarra(){
 
 if(!abaAtual || !abaAtual.webview) return
 
-const urlBar = document.getElementById("url")
-
-if(!urlBar) return
-
 try{
 
+if(urlBar){
 urlBar.value = abaAtual.webview.getURL()
+}
 
 }catch(err){
 
@@ -99,29 +124,46 @@ console.warn("Erro ao atualizar URL")
 
 
 // ===============================
-// EVENTOS DA PÁGINA
+// VOLTAR
 // ===============================
 
-window.addEventListener("DOMContentLoaded", () => {
+function voltar(){
 
-const urlBar = document.getElementById("url")
+if(!abaAtual || !abaAtual.webview) return
 
-if(!urlBar) return
-
-
-// ENTER NA BARRA
-
-urlBar.addEventListener("keydown",(e)=>{
-
-if(e.key === "Enter"){
-
-navegar()
+if(abaAtual.webview.canGoBack()){
+abaAtual.webview.goBack()
+}
 
 }
 
-})
 
-})
+// ===============================
+// AVANÇAR
+// ===============================
+
+function avancar(){
+
+if(!abaAtual || !abaAtual.webview) return
+
+if(abaAtual.webview.canGoForward()){
+abaAtual.webview.goForward()
+}
+
+}
+
+
+// ===============================
+// RECARREGAR
+// ===============================
+
+function recarregar(){
+
+if(!abaAtual || !abaAtual.webview) return
+
+abaAtual.webview.reload()
+
+}
 
 
 // ===============================
@@ -131,18 +173,20 @@ navegar()
 document.addEventListener("keydown",(e)=>{
 
 
-// Ctrl + L -> focar barra
+// Ctrl + L
 
 if(e.ctrlKey && e.key === "l"){
 
 e.preventDefault()
 
-document.getElementById("url").focus()
+if(urlBar){
+urlBar.focus()
+}
 
 }
 
 
-// Ctrl + T -> nova aba
+// Ctrl + T
 
 if(e.ctrlKey && e.key === "t"){
 
@@ -153,17 +197,26 @@ novaAba("https://www.google.com")
 }
 
 
-// Ctrl + W -> fechar aba
+// Ctrl + W
 
 if(e.ctrlKey && e.key === "w"){
 
 e.preventDefault()
 
 if(abaAtual){
-
 fecharAba(abaAtual.id)
+}
 
 }
+
+
+// Ctrl + R
+
+if(e.ctrlKey && e.key === "r"){
+
+e.preventDefault()
+
+recarregar()
 
 }
 
