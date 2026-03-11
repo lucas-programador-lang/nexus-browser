@@ -1,5 +1,6 @@
 let abas = []
 let abaAtual = null
+let contadorAbas = 0
 
 
 // ===============================
@@ -11,22 +12,26 @@ function novaAba(url = "https://www.google.com") {
 const browserContainer = document.getElementById("browser-container")
 const tabsContainer = document.getElementById("tabs")
 
-const id = "tab-" + Date.now()
+contadorAbas++
 
-// botão da aba
+const id = "tab-" + contadorAbas
+
+
+// -------------------------------
+// BOTÃO DA ABA
+// -------------------------------
+
 const tabButton = document.createElement("div")
 tabButton.className = "tab"
 tabButton.id = id
 
 
-// ícone do site
+// favicon
 const icon = document.createElement("img")
 icon.src = "https://www.google.com/favicon.ico"
-icon.width = 16
-icon.height = 16
 
 
-// título da aba
+// título
 const titulo = document.createElement("span")
 titulo.innerText = "Nova Aba"
 
@@ -36,7 +41,7 @@ const fechar = document.createElement("span")
 fechar.innerText = "✕"
 fechar.className = "close-tab"
 
-fechar.onclick = (e) => {
+fechar.onclick = (e)=>{
 
 e.stopPropagation()
 fecharAba(id)
@@ -49,35 +54,32 @@ tabButton.appendChild(icon)
 tabButton.appendChild(titulo)
 tabButton.appendChild(fechar)
 
-tabButton.onclick = () => trocarAba(id)
+tabButton.onclick = ()=> trocarAba(id)
 
 tabsContainer.appendChild(tabButton)
 
 
-// ===============================
+// -------------------------------
 // WEBVIEW
-// ===============================
+// -------------------------------
 
 const webview = document.createElement("webview")
 
 webview.src = url
-webview.style.width = "100%"
-webview.style.height = "100%"
-webview.style.display = "none"
-
+webview.className = "browser-view"
 webview.id = "view-" + id
 
 
-// atualizar título
-webview.addEventListener("page-title-updated", (e) => {
+// título
+webview.addEventListener("page-title-updated",(e)=>{
 
-titulo.innerText = e.title.substring(0, 20)
+titulo.innerText = e.title.substring(0,25)
 
 })
 
 
-// atualizar favicon
-webview.addEventListener("page-favicon-updated", (e) => {
+// favicon
+webview.addEventListener("page-favicon-updated",(e)=>{
 
 if(e.favicons && e.favicons.length){
 
@@ -88,32 +90,10 @@ icon.src = e.favicons[0]
 })
 
 
-// atualizar barra de URL
-webview.addEventListener("did-navigate", () => {
-
-const urlBar = document.getElementById("url")
-
-if (urlBar && abaAtual && abaAtual.webview === webview) {
-
-urlBar.value = webview.getURL()
-
-}
-
-})
-
-
-// página carregou
-webview.addEventListener("did-finish-load", () => {
-
-const urlBar = document.getElementById("url")
-
-if (urlBar && abaAtual && abaAtual.webview === webview) {
-
-urlBar.value = webview.getURL()
-
-}
-
-})
+// atualizar URL
+webview.addEventListener("did-navigate", atualizarBarra)
+webview.addEventListener("did-navigate-in-page", atualizarBarra)
+webview.addEventListener("did-finish-load", atualizarBarra)
 
 
 browserContainer.appendChild(webview)
@@ -122,14 +102,14 @@ browserContainer.appendChild(webview)
 // salvar aba
 abas.push({
 
-id: id,
-botao: tabButton,
-webview: webview
+id:id,
+botao:tabButton,
+webview:webview
 
 })
 
 
-// ativar aba
+// ativar
 trocarAba(id)
 
 }
@@ -140,33 +120,25 @@ trocarAba(id)
 // TROCAR ABA
 // ===============================
 
-function trocarAba(id) {
+function trocarAba(id){
 
-abas.forEach(tab => {
+abas.forEach(tab=>{
 
-tab.webview.style.display = "none"
+tab.webview.style.display="none"
 tab.botao.classList.remove("active-tab")
 
 })
 
-const aba = abas.find(t => t.id === id)
+const aba = abas.find(t=>t.id === id)
 
-if (aba) {
+if(!aba) return
 
-aba.webview.style.display = "flex"
+aba.webview.style.display="flex"
 aba.botao.classList.add("active-tab")
 
 abaAtual = aba
 
-const urlBar = document.getElementById("url")
-
-if (urlBar) {
-
-urlBar.value = aba.webview.getURL() || ""
-
-}
-
-}
+atualizarBarra()
 
 }
 
@@ -176,28 +148,31 @@ urlBar.value = aba.webview.getURL() || ""
 // FECHAR ABA
 // ===============================
 
-function fecharAba(id) {
+function fecharAba(id){
 
-const index = abas.findIndex(t => t.id === id)
+const index = abas.findIndex(t=>t.id === id)
 
-if (index === -1) return
+if(index === -1) return
 
 const aba = abas[index]
 
 aba.webview.remove()
 aba.botao.remove()
 
-abas.splice(index, 1)
+abas.splice(index,1)
 
 
-// abrir outra aba
-if (abas.length > 0) {
+// abrir aba anterior
 
-trocarAba(abas[Math.max(0, index - 1)].id)
+if(abas.length){
 
-} else {
+const novaIndex = Math.max(0,index-1)
 
-novaAba("https://www.google.com")
+trocarAba(abas[novaIndex].id)
+
+}else{
+
+novaAba()
 
 }
 
