@@ -22,6 +22,9 @@ minHeight:600,
 
 backgroundColor:"#0f172a",
 
+// ÍCONE DO NAVEGADOR
+icon: path.join(__dirname,"assets/logo.png"),
+
 webPreferences:{
 
 preload: path.join(__dirname,"preload.js"),
@@ -44,22 +47,22 @@ enableBlinkFeatures:"OverlayScrollbars"
 mainWindow.loadFile("index.html")
 
 
-// abrir links externos no navegador do sistema
+// abrir links externos no navegador padrão
 mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 
 shell.openExternal(url)
 
-return { action: "deny" }
+return { action:"deny" }
 
 })
 
 
-// remover menu
+// remover menu padrão
 mainWindow.setMenu(null)
 
 
 // otimizar memória
-mainWindow.webContents.on("did-finish-load", () => {
+mainWindow.webContents.on("did-finish-load",()=>{
 
 mainWindow.webContents.setZoomFactor(1)
 
@@ -72,7 +75,7 @@ mainWindow.webContents.setZoomFactor(1)
 // INICIAR APP
 // ===============================
 
-app.whenReady().then(() => {
+app.whenReady().then(()=>{
 
 try{
 
@@ -86,8 +89,9 @@ console.error("Erro ao iniciar AdBlock:",err)
 
 createWindow()
 
+
 // comportamento macOS
-app.on("activate", () => {
+app.on("activate",()=>{
 
 if(BrowserWindow.getAllWindows().length === 0){
 createWindow()
@@ -102,7 +106,7 @@ createWindow()
 // FECHAR APP
 // ===============================
 
-app.on("window-all-closed", () => {
+app.on("window-all-closed",()=>{
 
 if(process.platform !== "darwin"){
 app.quit()
@@ -115,14 +119,13 @@ app.quit()
 // SEGURANÇA EXTRA
 // ===============================
 
-// bloquear downloads suspeitos
-session.defaultSession.on("will-download", (event, item) => {
+session.defaultSession.on("will-download",(event,item)=>{
 
 const url = item.getURL()
 
 if(url.includes(".exe") || url.includes(".bat")){
 
-console.warn("Download potencialmente perigoso bloqueado:", url)
+console.warn("Download potencialmente perigoso detectado:",url)
 
 }
 
