@@ -1,1 +1,36 @@
+<!DOCTYPE html>
+<html>
 
+<head>
+<meta charset="UTF-8">
+<title>Nexus Browser</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="topbar">
+
+<input id="url" placeholder="Pesquisar ou digitar URL">
+
+<button onclick="navegar()">Ir</button>
+
+<button onclick="resumir()">IA</button>
+
+<button onclick="modoEstudo()">Modo Estudo</button>
+
+</div>
+
+<div class="tabs">
+<button onclick="novaAba()">Nova Aba</button>
+</div>
+
+<webview id="browser" src="https://google.com"></webview>
+
+<script src="renderer.js"></script>
+<script src="ai.js"></script>
+<script src="security.js"></script>
+
+</body>
+
+</html>
