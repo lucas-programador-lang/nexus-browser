@@ -1,10 +1,15 @@
-const { app, BrowserWindow, shell } = require("electron")
+const { app, BrowserWindow, shell, session } = require("electron")
 const path = require("path")
 
 // bloqueador de anúncios
 const enableAdBlock = require("./security/adblock")
 
 let mainWindow
+
+
+// ===============================
+// CRIAR JANELA
+// ===============================
 
 function createWindow(){
 
@@ -15,19 +20,31 @@ height:900,
 minWidth:900,
 minHeight:600,
 
+backgroundColor:"#0f172a",
+
 webPreferences:{
+
 preload: path.join(__dirname,"preload.js"),
+
 nodeIntegration:false,
 contextIsolation:true,
-webviewTag:true
+
+webviewTag:true,
+
+// melhorar performance
+sandbox:true,
+enableBlinkFeatures:"OverlayScrollbars"
+
 }
 
 })
 
-// carregar interface do navegador
+
+// carregar interface
 mainWindow.loadFile("index.html")
 
-// impedir abrir novas janelas internas perigosas
+
+// abrir links externos no navegador do sistema
 mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 
 shell.openExternal(url)
@@ -36,29 +53,41 @@ return { action: "deny" }
 
 })
 
-// remover menu padrão
+
+// remover menu
 mainWindow.setMenu(null)
 
+
+// otimizar memória
+mainWindow.webContents.on("did-finish-load", () => {
+
+mainWindow.webContents.setZoomFactor(1)
+
+})
+
 }
+
+
+// ===============================
+// INICIAR APP
+// ===============================
 
 app.whenReady().then(() => {
 
 try{
 
-// ativar bloqueador de anúncios
 enableAdBlock()
 
 }catch(err){
 
-console.error("Erro ao iniciar adblock:",err)
+console.error("Erro ao iniciar AdBlock:",err)
 
 }
 
-// criar janela
 createWindow()
 
-// comportamento padrão macOS
-app.on("activate",()=>{
+// comportamento macOS
+app.on("activate", () => {
 
 if(BrowserWindow.getAllWindows().length === 0){
 createWindow()
@@ -68,11 +97,33 @@ createWindow()
 
 })
 
-// fechar app quando todas janelas fecharem
-app.on("window-all-closed",()=>{
+
+// ===============================
+// FECHAR APP
+// ===============================
+
+app.on("window-all-closed", () => {
 
 if(process.platform !== "darwin"){
 app.quit()
+}
+
+})
+
+
+// ===============================
+// SEGURANÇA EXTRA
+// ===============================
+
+// bloquear downloads suspeitos
+session.defaultSession.on("will-download", (event, item) => {
+
+const url = item.getURL()
+
+if(url.includes(".exe") || url.includes(".bat")){
+
+console.warn("Download potencialmente perigoso bloqueado:", url)
+
 }
 
 })
