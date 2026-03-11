@@ -9,6 +9,7 @@
 
 <body>
 
+<!-- Barra superior -->
 <div class="topbar">
 
 <input id="url" placeholder="Pesquisar ou digitar URL">
@@ -19,17 +20,29 @@
 
 <button onclick="modoEstudo()">Modo Estudo</button>
 
+<button onclick="novaAba()">+ Nova Aba</button>
+
 </div>
 
-<div class="tabs">
-<button onclick="novaAba()">Nova Aba</button>
-</div>
+<!-- Área das abas -->
+<div id="tabs"></div>
 
-<webview id="browser" src="https://google.com"></webview>
+<!-- Área onde ficam os navegadores -->
+<div id="browser-container"></div>
 
+<script src="tabs.js"></script>
 <script src="renderer.js"></script>
 <script src="ai.js"></script>
 <script src="security.js"></script>
+
+<script>
+
+// criar primeira aba automaticamente
+window.onload = function(){
+novaAba("https://google.com")
+}
+
+</script>
 
 </body>
 
