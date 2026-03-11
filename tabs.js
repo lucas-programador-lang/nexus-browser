@@ -1,7 +1,7 @@
 let abas = []
 let abaAtual = null
 
-function novaAba(url = "https://google.com"){
+function novaAba(url = "https://www.google.com") {
 
 const browserContainer = document.getElementById("browser-container")
 const tabsContainer = document.getElementById("tabs")
@@ -13,7 +13,7 @@ const tabButton = document.createElement("div")
 tabButton.className = "tab"
 tabButton.id = id
 
-// título da aba
+// título
 const titulo = document.createElement("span")
 titulo.innerText = "Nova Aba"
 
@@ -22,7 +22,7 @@ const fechar = document.createElement("span")
 fechar.innerText = " ✕"
 fechar.className = "close-tab"
 
-fechar.onclick = (e)=>{
+fechar.onclick = (e) => {
 e.stopPropagation()
 fecharAba(id)
 }
@@ -30,7 +30,7 @@ fecharAba(id)
 tabButton.appendChild(titulo)
 tabButton.appendChild(fechar)
 
-tabButton.onclick = ()=> trocarAba(id)
+tabButton.onclick = () => trocarAba(id)
 
 tabsContainer.appendChild(tabButton)
 
@@ -45,14 +45,22 @@ webview.style.display = "none"
 webview.id = "view-" + id
 
 // atualizar título da aba
-webview.addEventListener("page-title-updated", (e)=>{
-titulo.innerText = e.title.substring(0,20)
+webview.addEventListener("page-title-updated", (e) => {
+titulo.innerText = e.title.substring(0, 25)
 })
 
 // atualizar barra de URL
-webview.addEventListener("did-navigate", ()=>{
+webview.addEventListener("did-navigate", () => {
 const urlBar = document.getElementById("url")
-if(urlBar){
+if (urlBar) {
+urlBar.value = webview.getURL()
+}
+})
+
+// atualizar URL quando carregar
+webview.addEventListener("did-finish-load", () => {
+const urlBar = document.getElementById("url")
+if (urlBar && abaAtual && abaAtual.webview === webview) {
 urlBar.value = webview.getURL()
 }
 })
@@ -60,51 +68,62 @@ urlBar.value = webview.getURL()
 browserContainer.appendChild(webview)
 
 abas.push({
-id:id,
-botao:tabButton,
-webview:webview
+id: id,
+botao: tabButton,
+webview: webview
 })
 
 trocarAba(id)
 
 }
 
-function trocarAba(id){
+// trocar aba
+function trocarAba(id) {
 
-abas.forEach(tab=>{
+abas.forEach(tab => {
 
 tab.webview.style.display = "none"
 tab.botao.classList.remove("active-tab")
 
 })
 
-const aba = abas.find(t=>t.id === id)
+const aba = abas.find(t => t.id === id)
 
-if(aba){
+if (aba) {
 
 aba.webview.style.display = "flex"
 aba.botao.classList.add("active-tab")
+
 abaAtual = aba
 
+const urlBar = document.getElementById("url")
+if (urlBar) {
+urlBar.value = aba.webview.getURL() || ""
 }
 
 }
 
-function fecharAba(id){
+}
 
-const index = abas.findIndex(t=>t.id === id)
+// fechar aba
+function fecharAba(id) {
 
-if(index === -1) return
+const index = abas.findIndex(t => t.id === id)
+
+if (index === -1) return
 
 const aba = abas[index]
 
 aba.webview.remove()
 aba.botao.remove()
 
-abas.splice(index,1)
+abas.splice(index, 1)
 
-if(abas.length > 0){
-trocarAba(abas[Math.max(0,index-1)].id)
+// abrir outra aba automaticamente
+if (abas.length > 0) {
+trocarAba(abas[Math.max(0, index - 1)].id)
+} else {
+novaAba("https://www.google.com")
 }
 
 }
