@@ -1,52 +1,87 @@
+/* ============================= */
+/* BASE */
+/* ============================= */
+
 body{
 margin:0;
-font-family:Arial, Helvetica, sans-serif;
+font-family:Segoe UI, Arial, Helvetica, sans-serif;
 background:#0f172a;
 color:white;
 height:100vh;
 display:flex;
 flex-direction:column;
+overflow:hidden;
 }
 
-/* barra superior */
+
+/* ============================= */
+/* BARRA SUPERIOR */
+/* ============================= */
 
 .topbar{
 display:flex;
 align-items:center;
-gap:10px;
-padding:10px;
+gap:8px;
+padding:8px 12px;
 background:#020617;
 border-bottom:1px solid #1e293b;
 }
+
 
 /* barra de endereço */
 
 #url{
 flex:1;
-padding:8px 10px;
-font-size:15px;
-border-radius:6px;
+padding:8px 12px;
+font-size:14px;
+border-radius:8px;
 border:none;
 outline:none;
+background:#1e293b;
+color:white;
+transition:0.2s;
 }
 
-/* botões */
+#url:focus{
+background:#334155;
+}
+
+
+/* ============================= */
+/* BOTÕES */
+/* ============================= */
 
 button{
-padding:8px 12px;
+padding:7px 12px;
 background:#2563eb;
 border:none;
 color:white;
 cursor:pointer;
-border-radius:6px;
-transition:0.2s;
+border-radius:8px;
+font-size:13px;
+transition:0.15s;
 }
 
 button:hover{
 background:#1d4ed8;
+transform:scale(1.03);
 }
 
-/* barra de abas */
+
+/* botão nova aba */
+
+#btnNovaAba{
+background:#16a34a;
+}
+
+#btnNovaAba:hover{
+background:#15803d;
+}
+
+
+/* ============================= */
+/* BARRA DE ABAS */
+/* ============================= */
 
 #tabs{
 display:flex;
@@ -54,53 +89,78 @@ align-items:center;
 background:#111827;
 padding:6px;
 overflow-x:auto;
+border-bottom:1px solid #1e293b;
 }
 
-/* aba */
+
+/* ============================= */
+/* ABAS */
+/* ============================= */
 
 .tab{
 background:#1f2937;
-color:white;
-padding:6px 10px;
+color:#e5e7eb;
+padding:6px 12px;
 margin-right:6px;
-border-radius:6px;
+border-radius:8px;
 cursor:pointer;
 display:flex;
 align-items:center;
-gap:6px;
-font-size:14px;
+gap:8px;
+font-size:13px;
+min-width:90px;
+transition:0.15s;
 }
 
 .tab:hover{
 background:#374151;
 }
 
+
 /* aba ativa */
 
 .active-tab{
 background:#2563eb;
+color:white;
 }
 
-/* botão fechar aba */
+
+/* ícone da aba */
+
+.tab img{
+width:16px;
+height:16px;
+}
+
+
+/* botão fechar */
 
 .close-tab{
-color:#ccc;
+color:#cbd5f5;
+font-size:13px;
 cursor:pointer;
-font-size:14px;
+margin-left:4px;
+transition:0.15s;
 }
 
 .close-tab:hover{
 color:white;
+transform:scale(1.1);
 }
 
-/* área do navegador */
+
+/* ============================= */
+/* ÁREA DO NAVEGADOR */
+/* ============================= */
 
 #browser-container{
 flex:1;
 width:100%;
 height:100%;
 position:relative;
+background:#020617;
 }
+
 
 /* webview */
 
@@ -111,4 +171,22 @@ left:0;
 width:100%;
 height:100%;
 border:none;
+}
+
+
+/* ============================= */
+/* SCROLL DAS ABAS */
+/* ============================= */
+
+#tabs::-webkit-scrollbar{
+height:6px;
+}
+
+#tabs::-webkit-scrollbar-thumb{
+background:#374151;
+border-radius:10px;
+}
+
+#tabs::-webkit-scrollbar-track{
+background:transparent;
 }
