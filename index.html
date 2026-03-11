@@ -14,24 +14,37 @@
 <body>
 
 <!-- ===================== -->
+<!-- LOGO -->
+<!-- ===================== -->
+
+<img src="assets/logo.png" id="logo">
+
+<!-- ===================== -->
 <!-- BARRA SUPERIOR -->
 <!-- ===================== -->
-<img src="assets/logo.png" id="logo">  
 
 <div class="topbar">
 
-<!-- navegação -->
+<!-- CONTROLES DE NAVEGAÇÃO -->
 
 <div class="nav-controls">
 
-<button id="btnVoltar">⬅</button>
-<button id="btnAvancar">➡</button>
-<button id="btnRecarregar">🔄</button>
+<button id="btnVoltar" title="Voltar">
+←
+</button>
+
+<button id="btnAvancar" title="Avançar">
+→
+</button>
+
+<button id="btnRecarregar" title="Recarregar">
+⟳
+</button>
 
 </div>
 
 
-<!-- barra de endereço -->
+<!-- BARRA DE URL -->
 
 <input
 id="url"
@@ -41,17 +54,36 @@ autocomplete="off"
 />
 
 
-<!-- botões extras -->
+<!-- BOTÕES PRINCIPAIS -->
 
 <div class="nav-buttons">
 
-<button id="btnIr">🌐 Ir</button>
+<button id="btnIr" title="Ir">
+🌐
+</button>
 
-<button id="btnIA">🤖 IA</button>
+<button id="btnIA" title="Assistente IA">
+🤖
+</button>
 
-<button id="btnEstudo">📖 Estudo</button>
+<button id="btnEstudo" title="Modo Estudo">
+📖
+</button>
 
-<button id="btnNovaAba">＋ Nova Aba</button>
+<button id="btnNovaAba" title="Nova Aba">
+＋
+</button>
+
+</div>
+
+
+<!-- MENU -->
+
+<div class="menu-area">
+
+<button id="btnMenu" title="Menu">
+☰
+</button>
 
 </div>
 
@@ -73,6 +105,23 @@ autocomplete="off"
 
 
 <!-- ===================== -->
+<!-- MENU DROPDOWN -->
+<!-- ===================== -->
+
+<div id="menuDropdown" class="menu-dropdown">
+
+<div class="menu-item">Nova guia</div>
+<div class="menu-item">Nova janela</div>
+<div class="menu-item">Histórico</div>
+<div class="menu-item">Downloads</div>
+<div class="menu-item">Favoritos</div>
+<div class="menu-item">Configurações</div>
+<div class="menu-item">Ajuda</div>
+
+</div>
+
+
+<!-- ===================== -->
 <!-- SCRIPTS -->
 <!-- ===================== -->
 
@@ -85,123 +134,27 @@ autocomplete="off"
 
 window.addEventListener("DOMContentLoaded", () => {
 
-const urlBar = document.getElementById("url")
-
-const btnIr = document.getElementById("btnIr")
-const btnNovaAba = document.getElementById("btnNovaAba")
-
-const btnIA = document.getElementById("btnIA")
-const btnEstudo = document.getElementById("btnEstudo")
-
-const btnVoltar = document.getElementById("btnVoltar")
-const btnAvancar = document.getElementById("btnAvancar")
-const btnRecarregar = document.getElementById("btnRecarregar")
-
+const btnMenu = document.getElementById("btnMenu")
+const menu = document.getElementById("menuDropdown")
 
 // primeira aba
 novaAba("https://www.google.com")
 
+// abrir menu
+btnMenu.addEventListener("click", () => {
 
-// ====================
-// NAVEGAR
-// ====================
-
-btnIr.addEventListener("click", navegar)
-
-
-// ENTER
-urlBar.addEventListener("keydown",(e)=>{
-
-if(e.key === "Enter"){
-
-navegar()
-
-}
+menu.style.display =
+menu.style.display === "block"
+? "none"
+: "block"
 
 })
 
+// fechar menu ao clicar fora
+document.addEventListener("click",(e)=>{
 
-// ====================
-// NOVA ABA
-// ====================
-
-btnNovaAba.addEventListener("click", ()=>{
-
-novaAba("https://www.google.com")
-
-})
-
-
-// ====================
-// IA
-// ====================
-
-btnIA.addEventListener("click", ()=>{
-
-if(typeof resumir === "function"){
-
-resumir()
-
-}
-
-})
-
-
-// ====================
-// MODO ESTUDO
-// ====================
-
-btnEstudo.addEventListener("click", ()=>{
-
-if(typeof modoEstudo === "function"){
-
-modoEstudo()
-
-}
-
-})
-
-
-// ====================
-// VOLTAR
-// ====================
-
-btnVoltar.addEventListener("click", ()=>{
-
-if(abaAtual && abaAtual.webview){
-
-abaAtual.webview.goBack()
-
-}
-
-})
-
-
-// ====================
-// AVANÇAR
-// ====================
-
-btnAvancar.addEventListener("click", ()=>{
-
-if(abaAtual && abaAtual.webview){
-
-abaAtual.webview.goForward()
-
-}
-
-})
-
-
-// ====================
-// RECARREGAR
-// ====================
-
-btnRecarregar.addEventListener("click", ()=>{
-
-if(abaAtual && abaAtual.webview){
-
-abaAtual.webview.reload()
-
+if(!btnMenu.contains(e.target) && !menu.contains(e.target)){
+menu.style.display="none"
 }
 
 })
