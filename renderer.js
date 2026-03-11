@@ -1,18 +1,19 @@
 function navegar(){
 
-let urlInput = document.getElementById("url").value.trim()
-let browser = document.getElementById("browser")
+const urlBar = document.getElementById("url")
 
-if(!urlInput){
-return
-}
+if(!urlBar) return
 
-// se não tiver ponto, considerar como pesquisa
+let urlInput = urlBar.value.trim()
+
+if(!urlInput) return
+
+// pesquisa se não tiver domínio
 if(!urlInput.includes(".")){
 urlInput = "https://www.google.com/search?q=" + encodeURIComponent(urlInput)
 }
 
-// adicionar https se não tiver protocolo
+// adicionar https
 if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
 urlInput = "https://" + urlInput
 }
@@ -22,7 +23,47 @@ if(typeof verificarSite === "function"){
 verificarSite(urlInput)
 }
 
-// abrir página
-browser.src = urlInput
+// verificar se existe aba ativa
+if(!abaAtual || !abaAtual.webview){
+console.warn("Nenhuma aba ativa")
+return
+}
+
+// navegar
+abaAtual.webview.src = urlInput
 
 }
+
+
+// atualizar barra de endereço quando navegar
+function atualizarBarra(){
+
+if(!abaAtual || !abaAtual.webview) return
+
+const urlBar = document.getElementById("url")
+
+if(urlBar){
+urlBar.value = abaAtual.webview.getURL()
+}
+
+}
+
+
+// listeners quando o navegador carregar
+window.addEventListener("DOMContentLoaded", () => {
+
+const urlBar = document.getElementById("url")
+
+if(urlBar){
+
+urlBar.addEventListener("keydown",(e)=>{
+
+if(e.key === "Enter"){
+navegar()
+}
+
+})
+
+}
+
+})
