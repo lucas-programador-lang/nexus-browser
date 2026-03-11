@@ -1,11 +1,15 @@
+// =======================================
+// SISTEMA DE ABAS
+// =======================================
+
 let abas = []
 let abaAtual = null
 let contadorAbas = 0
 
 
-// ===============================
+// =======================================
 // NOVA ABA
-// ===============================
+// =======================================
 
 function novaAba(url = "https://www.google.com") {
 
@@ -17,9 +21,9 @@ contadorAbas++
 const id = "tab-" + contadorAbas
 
 
-// -------------------------------
+// =======================================
 // BOTÃO DA ABA
-// -------------------------------
+// =======================================
 
 const tabButton = document.createElement("div")
 tabButton.className = "tab"
@@ -27,16 +31,19 @@ tabButton.id = id
 
 
 // favicon
+
 const icon = document.createElement("img")
 icon.src = "https://www.google.com/favicon.ico"
 
 
 // título
+
 const titulo = document.createElement("span")
 titulo.innerText = "Nova Aba"
 
 
 // botão fechar
+
 const fechar = document.createElement("span")
 fechar.innerText = "✕"
 fechar.className = "close-tab"
@@ -50,6 +57,7 @@ fecharAba(id)
 
 
 // montar aba
+
 tabButton.appendChild(icon)
 tabButton.appendChild(titulo)
 tabButton.appendChild(fechar)
@@ -59,9 +67,9 @@ tabButton.onclick = ()=> trocarAba(id)
 tabsContainer.appendChild(tabButton)
 
 
-// -------------------------------
+// =======================================
 // WEBVIEW
-// -------------------------------
+// =======================================
 
 const webview = document.createElement("webview")
 
@@ -70,7 +78,8 @@ webview.className = "browser-view"
 webview.id = "view-" + id
 
 
-// título
+// título da página
+
 webview.addEventListener("page-title-updated",(e)=>{
 
 titulo.innerText = e.title.substring(0,25)
@@ -78,7 +87,8 @@ titulo.innerText = e.title.substring(0,25)
 })
 
 
-// favicon
+// favicon da página
+
 webview.addEventListener("page-favicon-updated",(e)=>{
 
 if(e.favicons && e.favicons.length){
@@ -90,16 +100,29 @@ icon.src = e.favicons[0]
 })
 
 
-// atualizar URL
+// atualizar barra de URL
+
 webview.addEventListener("did-navigate", atualizarBarra)
 webview.addEventListener("did-navigate-in-page", atualizarBarra)
 webview.addEventListener("did-finish-load", atualizarBarra)
 
 
+// abrir links externos em nova aba
+
+webview.addEventListener("new-window",(e)=>{
+
+novaAba(e.url)
+
+})
+
+
+// adicionar ao navegador
+
 browserContainer.appendChild(webview)
 
 
 // salvar aba
+
 abas.push({
 
 id:id,
@@ -109,16 +132,17 @@ webview:webview
 })
 
 
-// ativar
+// ativar aba
+
 trocarAba(id)
 
 }
 
 
 
-// ===============================
+// =======================================
 // TROCAR ABA
-// ===============================
+// =======================================
 
 function trocarAba(id){
 
@@ -144,9 +168,9 @@ atualizarBarra()
 
 
 
-// ===============================
+// =======================================
 // FECHAR ABA
-// ===============================
+// =======================================
 
 function fecharAba(id){
 
@@ -156,13 +180,17 @@ if(index === -1) return
 
 const aba = abas[index]
 
+// remover elementos
+
 aba.webview.remove()
 aba.botao.remove()
+
+// remover da lista
 
 abas.splice(index,1)
 
 
-// abrir aba anterior
+// se ainda existem abas
 
 if(abas.length){
 
