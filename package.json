@@ -13,20 +13,33 @@
   "build": {
     "appId": "com.nexus.browser",
     "productName": "Nexus Browser",
+
     "directories": {
       "output": "dist"
     },
+
     "files": [
       "**/*"
     ],
+
     "win": {
       "target": "nsis",
       "icon": "assets/logo.png"
+    },
+
+    "publish": {
+      "provider": "github",
+      "owner": "lucas-programador-lang",
+      "repo": "nexus-browser"
     }
   },
 
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.13.3"
+  },
+
+  "dependencies": {
+    "electron-updater": "^6.3.9"
   }
 }
