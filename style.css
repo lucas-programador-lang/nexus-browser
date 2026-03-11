@@ -21,14 +21,22 @@ overflow:hidden;
 .topbar{
 display:flex;
 align-items:center;
-gap:8px;
+gap:10px;
 padding:8px 12px;
 background:#020617;
 border-bottom:1px solid #1e293b;
 }
 
 
-/* barra de endereço */
+/* grupo de navegação */
+
+.nav-controls{
+display:flex;
+gap:6px;
+}
+
+
+/* barra de URL */
 
 #url{
 flex:1;
@@ -52,19 +60,49 @@ background:#334155;
 /* ============================= */
 
 button{
-padding:7px 12px;
-background:#2563eb;
+padding:6px 10px;
+background:#1e40af;
 border:none;
 color:white;
 cursor:pointer;
-border-radius:8px;
+border-radius:6px;
 font-size:13px;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:4px;
 transition:0.15s;
 }
 
 button:hover{
 background:#1d4ed8;
-transform:scale(1.03);
+}
+
+
+/* botões navegação */
+
+#btnVoltar,
+#btnAvancar,
+#btnRecarregar{
+width:32px;
+height:32px;
+padding:0;
+font-size:14px;
+background:#1f2937;
+}
+
+#btnVoltar:hover,
+#btnAvancar:hover,
+#btnRecarregar:hover{
+background:#374151;
+}
+
+
+/* botões da direita */
+
+.nav-buttons{
+display:flex;
+gap:6px;
 }
 
 
@@ -102,7 +140,7 @@ background:#1f2937;
 color:#e5e7eb;
 padding:6px 12px;
 margin-right:6px;
-border-radius:8px;
+border-radius:6px;
 cursor:pointer;
 display:flex;
 align-items:center;
@@ -140,12 +178,10 @@ color:#cbd5f5;
 font-size:13px;
 cursor:pointer;
 margin-left:4px;
-transition:0.15s;
 }
 
 .close-tab:hover{
 color:white;
-transform:scale(1.1);
 }
 
 
