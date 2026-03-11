@@ -1,11 +1,20 @@
+// ===============================
+// VERIFICAR SITE SUSPEITO
+// ===============================
+
 function verificarSite(url){
 
 if(!url) return
 
 url = url.toLowerCase()
 
-// palavras suspeitas comuns em golpes
+
+// ===============================
+// PALAVRAS SUSPEITAS
+// ===============================
+
 const palavrasSuspeitas = [
+
 "free-money",
 "bonus",
 "crypto-bonus",
@@ -14,42 +23,82 @@ const palavrasSuspeitas = [
 "earn-fast",
 "giveaway",
 "claim-reward",
-"bitcoin-free"
+"bitcoin-free",
+"easy-profit",
+"instant-money"
+
 ]
 
-// domínios encurtadores (usados em golpes)
+
+// ===============================
+// ENCURTADORES DE LINK
+// ===============================
+
 const encurtadores = [
+
 "bit.ly",
 "tinyurl.com",
 "cutt.ly",
 "t.co",
-"shorturl"
+"shorturl",
+"goo.gl",
+"is.gd"
+
 ]
 
-// verificar palavras suspeitas
-const palavraPerigosa = palavrasSuspeitas.some(p =>
-url.includes(p)
-)
 
-// verificar encurtadores
-const linkEncurtado = encurtadores.some(p =>
-url.includes(p)
-)
+// ===============================
+// DOMÍNIOS PERIGOSOS
+// ===============================
 
-// verificar HTTP inseguro
+const dominiosPerigosos = [
+
+"phishing",
+"login-secure",
+"account-verify",
+"update-wallet",
+"crypto-airdrop"
+
+]
+
+
+// ===============================
+// DETECÇÃO
+// ===============================
+
+const palavraPerigosa = palavrasSuspeitas.some(p => url.includes(p))
+
+const linkEncurtado = encurtadores.some(p => url.includes(p))
+
+const dominioFalso = dominiosPerigosos.some(p => url.includes(p))
+
 const httpInseguro = url.startsWith("http://")
+
+
+// ===============================
+// ALERTAS
+// ===============================
 
 if(palavraPerigosa){
 
-alert("⚠️ Este site contém termos frequentemente usados em golpes.")
+alert("⚠️ Atenção: Este site contém termos frequentemente usados em golpes.")
 
 }
+
 
 if(linkEncurtado){
 
-alert("⚠️ Este link é encurtado. Tenha cuidado antes de acessar.")
+alert("⚠️ Este link é encurtado. Verifique antes de acessar.")
 
 }
+
+
+if(dominioFalso){
+
+alert("⚠️ Possível página falsa detectada.")
+
+}
+
 
 if(httpInseguro){
 
