@@ -2,6 +2,7 @@
 <html>
 
 <head>
+
 <meta charset="UTF-8">
 <title>Nexus Browser</title>
 
@@ -11,31 +12,60 @@
 
 <body>
 
-<!-- Barra superior -->
+<!-- ===================== -->
+<!-- BARRA SUPERIOR -->
+<!-- ===================== -->
+
 <div class="topbar">
 
-<input 
+<div class="nav-left">
+
+<input
 id="url"
 type="text"
 placeholder="Pesquisar ou digitar URL"
 autocomplete="off"
 />
 
-<button id="btnIr">Ir</button>
+</div>
 
-<button id="btnIA">IA</button>
+<div class="nav-buttons">
 
-<button id="btnEstudo">Modo Estudo</button>
+<button id="btnIr" class="btn-primary">
+🌐 Ir
+</button>
 
-<button id="btnNovaAba">+ Nova Aba</button>
+<button id="btnIA" class="btn-secondary">
+🤖 IA
+</button>
+
+<button id="btnEstudo" class="btn-secondary">
+📖 Modo Estudo
+</button>
+
+<button id="btnNovaAba" class="btn-newtab">
+＋ Nova Aba
+</button>
 
 </div>
 
-<!-- Área das abas -->
+</div>
+
+<!-- ===================== -->
+<!-- ABAS -->
+<!-- ===================== -->
+
 <div id="tabs"></div>
 
-<!-- Área onde ficam os navegadores -->
+<!-- ===================== -->
+<!-- ÁREA DO NAVEGADOR -->
+<!-- ===================== -->
+
 <div id="browser-container"></div>
+
+<!-- ===================== -->
+<!-- SCRIPTS -->
+<!-- ===================== -->
 
 <script src="tabs.js"></script>
 <script src="renderer.js"></script>
@@ -44,27 +74,41 @@ autocomplete="off"
 
 <script>
 
-// iniciar navegador
 window.addEventListener("DOMContentLoaded", () => {
 
+const urlBar = document.getElementById("url")
+const btnIr = document.getElementById("btnIr")
+const btnNovaAba = document.getElementById("btnNovaAba")
+const btnIA = document.getElementById("btnIA")
+const btnEstudo = document.getElementById("btnEstudo")
+
+// primeira aba
 novaAba("https://www.google.com")
 
-// botão navegar
-document.getElementById("btnIr").addEventListener("click", navegar)
+// botão IR
+btnIr.addEventListener("click", navegar)
 
-// botão nova aba
-document.getElementById("btnNovaAba").addEventListener("click", () => {
+// botão NOVA ABA
+btnNovaAba.addEventListener("click", () => {
 novaAba("https://www.google.com")
 })
 
 // botão IA
-document.getElementById("btnIA").addEventListener("click", resumir)
+btnIA.addEventListener("click", () => {
+if(typeof resumir === "function"){
+resumir()
+}
+})
 
 // botão modo estudo
-document.getElementById("btnEstudo").addEventListener("click", modoEstudo)
+btnEstudo.addEventListener("click", () => {
+if(typeof modoEstudo === "function"){
+modoEstudo()
+}
+})
 
-// ENTER na barra de endereço
-document.getElementById("url").addEventListener("keydown", (e) => {
+// ENTER na barra
+urlBar.addEventListener("keydown", (e) => {
 
 if(e.key === "Enter"){
 navegar()
@@ -77,5 +121,4 @@ navegar()
 </script>
 
 </body>
-
 </html>
