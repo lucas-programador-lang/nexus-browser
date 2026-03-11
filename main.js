@@ -2,7 +2,7 @@ const { app, BrowserWindow, shell } = require("electron")
 const path = require("path")
 
 // bloqueador de anúncios
-const enableAdBlock = require("./security/adblock")
+const enableAdBlock = require("./adblock")
 
 let mainWindow
 
