@@ -1,7 +1,7 @@
-const { app, BrowserWindow } = require("electron")
+const { app, BrowserWindow, shell } = require("electron")
 const path = require("path")
 
-// carregar bloqueador de anúncios
+// bloqueador de anúncios
 const enableAdBlock = require("./security/adblock")
 
 let mainWindow
@@ -12,37 +12,64 @@ mainWindow = new BrowserWindow({
 
 width:1400,
 height:900,
+minWidth:900,
+minHeight:600,
 
 webPreferences:{
-preload: path.join(__dirname, "preload.js"),
-nodeIntegration: false,
-contextIsolation: true
+preload: path.join(__dirname,"preload.js"),
+nodeIntegration:false,
+contextIsolation:true,
+webviewTag:true
 }
 
 })
 
+// carregar interface do navegador
 mainWindow.loadFile("index.html")
+
+// impedir abrir novas janelas internas perigosas
+mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+
+shell.openExternal(url)
+
+return { action: "deny" }
+
+})
+
+// remover menu padrão
+mainWindow.setMenu(null)
 
 }
 
-// quando o Electron estiver pronto
 app.whenReady().then(() => {
 
+try{
+
+// ativar bloqueador de anúncios
 enableAdBlock()
 
+}catch(err){
+
+console.error("Erro ao iniciar adblock:",err)
+
+}
+
+// criar janela
 createWindow()
 
-// recriar janela se clicar no dock (Mac)
-app.on("activate", () => {
+// comportamento padrão macOS
+app.on("activate",()=>{
+
 if(BrowserWindow.getAllWindows().length === 0){
 createWindow()
 }
+
 })
 
 })
 
 // fechar app quando todas janelas fecharem
-app.on("window-all-closed", () => {
+app.on("window-all-closed",()=>{
 
 if(process.platform !== "darwin"){
 app.quit()
