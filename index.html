@@ -4,7 +4,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Nexus Browser</title>
+
 <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -12,15 +14,20 @@
 <!-- Barra superior -->
 <div class="topbar">
 
-<input id="url" placeholder="Pesquisar ou digitar URL">
+<input 
+id="url"
+type="text"
+placeholder="Pesquisar ou digitar URL"
+autocomplete="off"
+/>
 
-<button onclick="navegar()">Ir</button>
+<button id="btnIr">Ir</button>
 
-<button onclick="resumir()">IA</button>
+<button id="btnIA">IA</button>
 
-<button onclick="modoEstudo()">Modo Estudo</button>
+<button id="btnEstudo">Modo Estudo</button>
 
-<button onclick="novaAba()">+ Nova Aba</button>
+<button id="btnNovaAba">+ Nova Aba</button>
 
 </div>
 
@@ -33,13 +40,39 @@
 <script src="tabs.js"></script>
 <script src="renderer.js"></script>
 <script src="ai.js"></script>
-<script src="security/security.js"></script>
+<script src="security.js"></script>
+
 <script>
 
-// criar primeira aba automaticamente
-window.onload = function(){
-novaAba("https://google.com")
+// iniciar navegador
+window.addEventListener("DOMContentLoaded", () => {
+
+novaAba("https://www.google.com")
+
+// botão navegar
+document.getElementById("btnIr").addEventListener("click", navegar)
+
+// botão nova aba
+document.getElementById("btnNovaAba").addEventListener("click", () => {
+novaAba("https://www.google.com")
+})
+
+// botão IA
+document.getElementById("btnIA").addEventListener("click", resumir)
+
+// botão modo estudo
+document.getElementById("btnEstudo").addEventListener("click", modoEstudo)
+
+// ENTER na barra de endereço
+document.getElementById("url").addEventListener("keydown", (e) => {
+
+if(e.key === "Enter"){
+navegar()
 }
+
+})
+
+})
 
 </script>
 
