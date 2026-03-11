@@ -15,6 +15,21 @@ overflow:hidden;
 
 
 /* ============================= */
+/* LOGO DO NAVEGADOR */
+/* ============================= */
+
+#logo{
+position:absolute;
+top:10px;
+left:10px;
+width:28px;
+height:28px;
+z-index:1000;
+pointer-events:none;
+}
+
+
+/* ============================= */
 /* BARRA SUPERIOR */
 /* ============================= */
 
@@ -23,6 +38,7 @@ display:flex;
 align-items:center;
 gap:10px;
 padding:8px 12px;
+padding-left:45px;
 background:#020617;
 border-bottom:1px solid #1e293b;
 }
@@ -36,7 +52,9 @@ gap:6px;
 }
 
 
-/* barra de URL */
+/* ============================= */
+/* BARRA DE URL */
+/* ============================= */
 
 #url{
 flex:1;
@@ -79,7 +97,9 @@ background:#1d4ed8;
 }
 
 
-/* botões navegação */
+/* ============================= */
+/* BOTÕES DE NAVEGAÇÃO */
+/* ============================= */
 
 #btnVoltar,
 #btnAvancar,
@@ -98,7 +118,9 @@ background:#374151;
 }
 
 
-/* botões da direita */
+/* ============================= */
+/* BOTÕES DA DIREITA */
+/* ============================= */
 
 .nav-buttons{
 display:flex;
