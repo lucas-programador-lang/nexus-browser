@@ -20,12 +20,13 @@ overflow:hidden;
 
 #logo{
 position:absolute;
-top:10px;
+top:12px;
 left:10px;
-width:24px;
-height:24px;
+width:26px;
+height:26px;
 z-index:1000;
 pointer-events:none;
+opacity:0.9;
 }
 
 
@@ -38,7 +39,7 @@ display:flex;
 align-items:center;
 gap:8px;
 padding:8px 12px;
-padding-left:44px;
+padding-left:46px;
 background:#020617;
 border-bottom:1px solid #1e293b;
 height:48px;
@@ -63,14 +64,14 @@ gap:6px;
 #url{
 flex:1;
 height:34px;
-padding:0 12px;
+padding:0 14px;
 font-size:14px;
 border-radius:8px;
 border:none;
 outline:none;
 background:#1e293b;
 color:white;
-transition:0.2s;
+transition:all 0.2s ease;
 }
 
 #url:focus{
@@ -94,7 +95,7 @@ display:flex;
 align-items:center;
 justify-content:center;
 cursor:pointer;
-transition:background 0.15s;
+transition:all 0.15s ease;
 color:white;
 }
 
@@ -125,6 +126,7 @@ width:34px;
 #btnAvancar:hover,
 #btnRecarregar:hover{
 background:#374151;
+transform:scale(1.05);
 }
 
 
@@ -198,6 +200,7 @@ width:34px;
 
 #btnMenu:hover{
 background:#374151;
+transform:scale(1.05);
 }
 
 
@@ -268,7 +271,7 @@ max-width:200px;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
-transition:background 0.15s;
+transition:all 0.15s ease;
 }
 
 .tab:hover{
@@ -283,6 +286,7 @@ background:#374151;
 .active-tab{
 background:#2563eb;
 color:white;
+box-shadow:0 2px 6px rgba(0,0,0,0.4);
 }
 
 
