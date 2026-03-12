@@ -12,7 +12,7 @@ console.log("🚀 Nexus Browser iniciado")
 
 
 // =======================================
-// API SEGURA DO NAVEGADOR
+// API PRINCIPAL DO NAVEGADOR
 // =======================================
 
 contextBridge.exposeInMainWorld("nexus", {
@@ -69,5 +69,22 @@ saveSettings: (data) => ipcRenderer.invoke("save-settings", data),
 // ===============================
 
 askAI: (prompt) => ipcRenderer.invoke("ask-ai", prompt)
+
+})
+
+
+// =======================================
+// API PARA ATUALIZAÇÃO DO NAVEGADOR
+// =======================================
+
+contextBridge.exposeInMainWorld("nexusAPI", {
+
+send: (channel, data) => {
+ipcRenderer.send(channel, data)
+},
+
+receive: (channel, func) => {
+ipcRenderer.on(channel, (event, ...args) => func(...args))
+}
 
 })
