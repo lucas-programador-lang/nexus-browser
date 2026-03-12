@@ -121,52 +121,92 @@ function abrirPaginaInterna(url){
 
 if(!window.abaAtual || !window.abaAtual.webview) return
 
-let pagina = ""
+let titulo = ""
+let conteudo = ""
 
 if(url === "nexus://history"){
-
-pagina = `
-<h1>Histórico</h1>
-<p>Histórico do navegador.</p>
-`
-
+titulo = "Histórico"
+conteudo = "Histórico do navegador."
 }
 
 else if(url === "nexus://downloads"){
-
-pagina = `
-<h1>Downloads</h1>
-<p>Gerenciador de downloads.</p>
-`
-
+titulo = "Downloads"
+conteudo = "Gerenciador de downloads."
 }
 
 else if(url === "nexus://favorites"){
-
-pagina = `
-<h1>Favoritos</h1>
-<p>Seus sites favoritos.</p>
-`
-
+titulo = "Favoritos"
+conteudo = "Seus sites favoritos."
 }
 
 else if(url === "nexus://settings"){
-
-pagina = `
-<h1>Configurações</h1>
-<p>Configurações do Nexus Browser.</p>
-`
-
+titulo = "Configurações"
+conteudo = "Configurações do Nexus Browser."
 }
 
 else{
-
-pagina = `
-<h1>Nexus Browser</h1>
-<p>Página não encontrada.</p>
-`
-
+titulo = "Nexus Browser"
+conteudo = "Página não encontrada."
 }
+
+const pagina = `
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<style>
+
+body{
+font-family:Segoe UI, Arial;
+background:#0f172a;
+color:white;
+margin:0;
+padding:40px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+h1{
+font-size:32px;
+margin-bottom:10px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:10px;
+margin-top:20px;
+}
+
+p{
+color:#94a3b8;
+font-size:16px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>${titulo}</h1>
+
+<div class="card">
+<p>${conteudo}</p>
+</div>
+
+</div>
+
+</body>
+</html>
+`
 
 window.abaAtual.webview.loadURL(
 "data:text/html;charset=utf-8," + encodeURIComponent(pagina)
