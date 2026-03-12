@@ -25,8 +25,7 @@ btnIr = document.getElementById("btnIr")
 btnIA = document.getElementById("btnIA")
 btnEstudo = document.getElementById("btnEstudo")
 
-
-// ENTER NA BARRA
+// ENTER na barra
 if(urlBar){
 urlBar.addEventListener("keydown",(e)=>{
 if(e.key === "Enter"){
@@ -35,17 +34,13 @@ navegar()
 })
 }
 
-
-// BOTÕES NAVEGAÇÃO
-
+// BOTÕES
 if(btnVoltar) btnVoltar.onclick = voltar
 if(btnAvancar) btnAvancar.onclick = avancar
 if(btnRecarregar) btnRecarregar.onclick = recarregar
 if(btnIr) btnIr.onclick = navegar
 
-
 // IA
-
 if(btnIA){
 btnIA.onclick = ()=>{
 if(typeof abrirIA === "function"){
@@ -54,9 +49,7 @@ abrirIA()
 }
 }
 
-
 // MODO ESTUDO
-
 if(btnEstudo){
 btnEstudo.onclick = ()=>{
 if(typeof modoEstudo === "function"){
@@ -66,7 +59,6 @@ modoEstudo()
 }
 
 })
-
 
 
 // =======================================
@@ -81,58 +73,32 @@ let urlInput = urlBar.value.trim()
 
 if(!urlInput) return
 
-
 // PÁGINAS INTERNAS
-
 if(urlInput.startsWith("nexus://")){
 abrirPaginaInterna(urlInput)
 return
 }
 
-
 // PESQUISA GOOGLE
-
 if(!urlInput.includes(".")){
-
-urlInput =
-"https://www.google.com/search?q=" +
-encodeURIComponent(urlInput)
-
+urlInput = "https://www.google.com/search?q=" + encodeURIComponent(urlInput)
 }
 
-
 // HTTPS AUTOMÁTICO
-
 if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
 urlInput = "https://" + urlInput
 }
 
-
 // SEGURANÇA
-
 if(typeof verificarSite === "function"){
 verificarSite(urlInput)
 }
 
-
 // VERIFICAR ABA
-
 if(!window.abaAtual || !window.abaAtual.webview){
 console.warn("Nenhuma aba ativa")
 return
 }
-
-
-// EVITAR RELOAD
-
-try{
-if(window.abaAtual.webview.getURL() === urlInput){
-return
-}
-}catch(e){}
-
-
-// NAVEGAR
 
 try{
 window.abaAtual.webview.loadURL(urlInput)
@@ -143,12 +109,11 @@ console.error("Erro navegar:",err)
 }
 
 
-
 // =======================================
 // PÁGINAS INTERNAS
 // =======================================
 
-function abrirPaginaInterna(url){
+async function abrirPaginaInterna(url){
 
 if(!window.abaAtual || !window.abaAtual.webview) return
 
@@ -156,28 +121,74 @@ let titulo = ""
 let conteudo = ""
 
 if(url === "nexus://history"){
+
 titulo = "Histórico"
-conteudo = "Aqui aparecerá o histórico do navegador."
+
+try{
+
+const history = await window.nexus.getHistory()
+
+conteudo = history.map(h => `
+<div style="margin-bottom:10px">
+<a href="${h.url}" style="color:#60a5fa">${h.url}</a>
+</div>
+`).join("") || "Nenhum histórico ainda."
+
+}catch{
+conteudo = "Erro ao carregar histórico."
 }
+
+}
+
 
 else if(url === "nexus://downloads"){
+
 titulo = "Downloads"
-conteudo = "Gerenciador de downloads."
+
+conteudo = "Downloads aparecerão aqui quando você baixar arquivos."
+
 }
+
 
 else if(url === "nexus://favorites"){
+
 titulo = "Favoritos"
-conteudo = "Seus sites favoritos."
+
+try{
+
+const favs = await window.nexus.getFavorites()
+
+conteudo = favs.map(f => `
+<div style="margin-bottom:10px">
+<a href="${f.url}" style="color:#60a5fa">${f.title || f.url}</a>
+</div>
+`).join("") || "Nenhum favorito salvo."
+
+}catch{
+conteudo = "Erro ao carregar favoritos."
 }
+
+}
+
 
 else if(url === "nexus://settings"){
+
 titulo = "Configurações"
-conteudo = "Configurações do Nexus Browser."
+
+conteudo = `
+<button onclick="window.nexusAPI.send('check-update')">
+Verificar atualização do navegador
+</button>
+`
+
 }
 
+
 else{
+
 titulo = "Nexus Browser"
 conteudo = "Página não encontrada."
+
 }
 
 
@@ -185,7 +196,6 @@ const pagina = `
 <!DOCTYPE html>
 <html>
 <head>
-
 <meta charset="UTF-8">
 
 <style>
@@ -198,16 +208,16 @@ margin:0;
 padding:40px;
 }
 
-.container{
-max-width:900px;
-margin:auto;
-}
-
 .card{
 background:#1e293b;
 padding:20px;
 border-radius:10px;
 margin-top:20px;
+}
+
+a{
+color:#60a5fa;
+text-decoration:none;
 }
 
 </style>
@@ -216,14 +226,10 @@ margin-top:20px;
 
 <body>
 
-<div class="container">
-
 <h1>${titulo}</h1>
 
 <div class="card">
-<p>${conteudo}</p>
-</div>
-
+${conteudo}
 </div>
 
 </body>
@@ -235,7 +241,6 @@ window.abaAtual.webview.loadURL(
 )
 
 }
-
 
 
 // =======================================
@@ -265,7 +270,6 @@ console.warn("Erro atualizar barra")
 }
 
 
-
 // =======================================
 // VOLTAR
 // =======================================
@@ -275,17 +279,14 @@ function voltar(){
 if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
-
 if(window.abaAtual.webview.canGoBack()){
 window.abaAtual.webview.goBack()
 }
-
 }catch(e){
 console.warn("Erro voltar")
 }
 
 }
-
 
 
 // =======================================
@@ -297,17 +298,14 @@ function avancar(){
 if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
-
 if(window.abaAtual.webview.canGoForward()){
 window.abaAtual.webview.goForward()
 }
-
 }catch(e){
 console.warn("Erro avançar")
 }
 
 }
-
 
 
 // =======================================
