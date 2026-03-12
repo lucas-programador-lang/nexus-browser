@@ -22,8 +22,8 @@ overflow:hidden;
 position:absolute;
 top:10px;
 left:10px;
-width:28px;
-height:28px;
+width:26px;
+height:26px;
 z-index:1000;
 pointer-events:none;
 }
@@ -38,10 +38,11 @@ display:flex;
 align-items:center;
 gap:8px;
 padding:8px 12px;
-padding-left:45px;
+padding-left:44px;
 background:#020617;
 border-bottom:1px solid #1e293b;
 height:48px;
+box-sizing:border-box;
 }
 
 
@@ -86,22 +87,26 @@ button{
 height:34px;
 min-width:34px;
 padding:0 10px;
-background:#1e40af;
 border:none;
-color:white;
-cursor:pointer;
 border-radius:7px;
 font-size:14px;
 display:flex;
 align-items:center;
 justify-content:center;
-gap:4px;
-transition:0.15s;
+cursor:pointer;
+transition:background 0.15s;
+color:white;
 }
 
-button:hover{
-background:#1d4ed8;
-transform:scale(1.05);
+
+/* ============================= */
+/* ÍCONES BOTÕES */
+/* ============================= */
+
+button img{
+width:18px;
+height:18px;
+pointer-events:none;
 }
 
 
@@ -112,9 +117,8 @@ transform:scale(1.05);
 #btnVoltar,
 #btnAvancar,
 #btnRecarregar{
-width:34px;
 background:#1f2937;
-font-size:16px;
+width:34px;
 }
 
 #btnVoltar:hover,
@@ -185,14 +189,11 @@ background:#15803d;
 .menu-area{
 display:flex;
 align-items:center;
-margin-left:4px;
 }
 
 #btnMenu{
 background:#1f2937;
 width:34px;
-height:34px;
-font-size:18px;
 }
 
 #btnMenu:hover{
@@ -223,7 +224,7 @@ overflow:hidden;
 padding:12px 14px;
 cursor:pointer;
 font-size:14px;
-transition:0.15s;
+transition:background 0.15s;
 }
 
 .menu-item:hover{
@@ -242,7 +243,8 @@ background:#020617;
 padding:6px;
 overflow-x:auto;
 border-bottom:1px solid #1e293b;
-height:36px;
+height:38px;
+box-sizing:border-box;
 }
 
 
@@ -253,7 +255,7 @@ height:36px;
 .tab{
 background:#1f2937;
 color:#e5e7eb;
-padding:5px 12px;
+padding:6px 12px;
 margin-right:6px;
 border-radius:7px;
 cursor:pointer;
@@ -266,7 +268,7 @@ max-width:200px;
 white-space:nowrap;
 overflow:hidden;
 text-overflow:ellipsis;
-transition:0.15s;
+transition:background 0.15s;
 }
 
 .tab:hover{
@@ -274,7 +276,9 @@ background:#374151;
 }
 
 
+/* ============================= */
 /* ABA ATIVA */
+/* ============================= */
 
 .active-tab{
 background:#2563eb;
@@ -282,7 +286,9 @@ color:white;
 }
 
 
+/* ============================= */
 /* ÍCONE ABA */
+/* ============================= */
 
 .tab img{
 width:16px;
@@ -290,7 +296,9 @@ height:16px;
 }
 
 
+/* ============================= */
 /* BOTÃO FECHAR ABA */
+/* ============================= */
 
 .close-tab{
 margin-left:auto;
@@ -314,10 +322,13 @@ width:100%;
 height:100%;
 position:relative;
 background:#020617;
+overflow:hidden;
 }
 
 
+/* ============================= */
 /* WEBVIEW */
+/* ============================= */
 
 webview{
 position:absolute;
