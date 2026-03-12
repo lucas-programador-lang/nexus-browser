@@ -1,12 +1,12 @@
 // =======================================
-// CACHE DOM (melhor performance)
+// CACHE DOM
 // =======================================
 
-let urlBar = null
-let btnVoltar = null
-let btnAvancar = null
-let btnRecarregar = null
-let btnIr = null
+let urlBar
+let btnVoltar
+let btnAvancar
+let btnRecarregar
+let btnIr
 
 
 // =======================================
@@ -21,9 +21,8 @@ btnAvancar = document.getElementById("btnAvancar")
 btnRecarregar = document.getElementById("btnRecarregar")
 btnIr = document.getElementById("btnIr")
 
-// ENTER na barra
-
 if(urlBar){
+
 urlBar.addEventListener("keydown",(e)=>{
 
 if(e.key === "Enter"){
@@ -31,26 +30,16 @@ navegar()
 }
 
 })
+
 }
 
 
 // BOTÕES
 
-if(btnVoltar){
-btnVoltar.addEventListener("click",voltar)
-}
-
-if(btnAvancar){
-btnAvancar.addEventListener("click",avancar)
-}
-
-if(btnRecarregar){
-btnRecarregar.addEventListener("click",recarregar)
-}
-
-if(btnIr){
-btnIr.addEventListener("click",navegar)
-}
+btnVoltar?.addEventListener("click", voltar)
+btnAvancar?.addEventListener("click", avancar)
+btnRecarregar?.addEventListener("click", recarregar)
+btnIr?.addEventListener("click", navegar)
 
 })
 
@@ -91,27 +80,22 @@ urlInput = "https://" + urlInput
 }
 
 
-// VERIFICAÇÃO DE SEGURANÇA
+// SEGURANÇA
 
 if(typeof verificarSite === "function"){
-
 verificarSite(urlInput)
-
 }
 
 
-// VERIFICAR ABA ATIVA
+// ABA ATIVA
 
 if(!abaAtual || !abaAtual.webview){
-
 console.warn("Nenhuma aba ativa")
-
 return
-
 }
 
 
-// EVITAR RECARREGAR MESMA URL
+// EVITAR RELOAD DA MESMA URL
 
 try{
 
@@ -119,10 +103,10 @@ if(abaAtual.webview.getURL() === urlInput){
 return
 }
 
-}catch(err){}
+}catch(e){}
 
 
-// NAVEGAR
+// CARREGAR
 
 try{
 
@@ -138,7 +122,7 @@ console.error("Erro ao navegar:",err)
 
 
 // =======================================
-// ATUALIZAR BARRA DE URL
+// ATUALIZAR URL
 // =======================================
 
 function atualizarBarra(){
@@ -147,13 +131,11 @@ if(!abaAtual || !abaAtual.webview) return
 
 try{
 
-if(urlBar){
 urlBar.value = abaAtual.webview.getURL()
-}
 
-}catch(err){
+}catch(e){
 
-console.warn("Erro ao atualizar URL")
+console.warn("Erro atualizar barra")
 
 }
 
@@ -166,7 +148,7 @@ console.warn("Erro ao atualizar URL")
 
 function voltar(){
 
-if(!abaAtual || !abaAtual.webview) return
+if(!abaAtual?.webview) return
 
 try{
 
@@ -174,9 +156,9 @@ if(abaAtual.webview.canGoBack()){
 abaAtual.webview.goBack()
 }
 
-}catch(err){
+}catch(e){
 
-console.warn("Erro ao voltar")
+console.warn("Erro voltar")
 
 }
 
@@ -189,7 +171,7 @@ console.warn("Erro ao voltar")
 
 function avancar(){
 
-if(!abaAtual || !abaAtual.webview) return
+if(!abaAtual?.webview) return
 
 try{
 
@@ -197,9 +179,9 @@ if(abaAtual.webview.canGoForward()){
 abaAtual.webview.goForward()
 }
 
-}catch(err){
+}catch(e){
 
-console.warn("Erro ao avançar")
+console.warn("Erro avançar")
 
 }
 
@@ -212,15 +194,15 @@ console.warn("Erro ao avançar")
 
 function recarregar(){
 
-if(!abaAtual || !abaAtual.webview) return
+if(!abaAtual?.webview) return
 
 try{
 
 abaAtual.webview.reload()
 
-}catch(err){
+}catch(e){
 
-console.warn("Erro ao recarregar")
+console.warn("Erro reload")
 
 }
 
@@ -228,27 +210,25 @@ console.warn("Erro ao recarregar")
 
 
 // =======================================
-// ATALHOS DE TECLADO
+// ATALHOS
 // =======================================
 
 document.addEventListener("keydown",(e)=>{
 
 
-// Ctrl + L → focar barra
+// CTRL L → barra
 
 if(e.ctrlKey && e.key === "l"){
 
 e.preventDefault()
 
-if(urlBar){
 urlBar.focus()
 urlBar.select()
-}
 
 }
 
 
-// Ctrl + T → nova aba
+// CTRL T → nova aba
 
 if(e.ctrlKey && e.key === "t"){
 
@@ -259,7 +239,7 @@ novaAba("https://www.google.com")
 }
 
 
-// Ctrl + W → fechar aba
+// CTRL W → fechar aba
 
 if(e.ctrlKey && e.key === "w"){
 
@@ -272,7 +252,7 @@ fecharAba(abaAtual.id)
 }
 
 
-// Ctrl + R → recarregar
+// CTRL R → reload
 
 if(e.ctrlKey && e.key === "r"){
 
@@ -283,21 +263,39 @@ recarregar()
 }
 
 
-// Alt + ← voltar
+// CTRL H → histórico
 
-if(e.altKey && e.key === "ArrowLeft"){
+if(e.ctrlKey && e.key === "h"){
 
-voltar()
+e.preventDefault()
+
+alert("Histórico em desenvolvimento")
 
 }
 
 
-// Alt + → avançar
+// CTRL D → favoritos
+
+if(e.ctrlKey && e.key === "d"){
+
+e.preventDefault()
+
+alert("Favoritos em desenvolvimento")
+
+}
+
+
+// ALT ←
+
+if(e.altKey && e.key === "ArrowLeft"){
+voltar()
+}
+
+
+// ALT →
 
 if(e.altKey && e.key === "ArrowRight"){
-
 avancar()
-
 }
 
 })
