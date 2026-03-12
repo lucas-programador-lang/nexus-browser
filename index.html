@@ -85,7 +85,7 @@ autocomplete="off"
 <div id="browser-container"></div>
 
 
-<!-- MENU -->
+<!-- MENU DROPDOWN -->
 <div id="menuDropdown" class="menu-dropdown">
 
 <div class="menu-item" id="menuNovaGuia">Nova guia</div>
@@ -111,6 +111,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
 const menu = document.getElementById("menuDropdown")
 const btnMenu = document.getElementById("btnMenu")
+const urlBar = document.getElementById("url")
 
 // primeira aba
 novaAba("https://www.google.com")
@@ -136,20 +137,43 @@ menu.style.display="none"
 
 })
 
-// ações do menu
-document.getElementById("menuNovaGuia").onclick = ()=> novaAba("https://www.google.com")
 
-document.getElementById("menuNovaJanela").onclick = ()=> alert("Nova janela em desenvolvimento")
+// ===============================
+// AÇÕES DO MENU
+// ===============================
 
-document.getElementById("menuHistorico").onclick = ()=> alert("Histórico em desenvolvimento")
+document.getElementById("menuNovaGuia").onclick = ()=>{
+novaAba("https://www.google.com")
+}
 
-document.getElementById("menuDownloads").onclick = ()=> alert("Downloads em desenvolvimento")
+document.getElementById("menuNovaJanela").onclick = ()=>{
+novaAba("https://www.google.com")
+}
 
-document.getElementById("menuFavoritos").onclick = ()=> alert("Favoritos em desenvolvimento")
+document.getElementById("menuHistorico").onclick = ()=>{
+urlBar.value = "nexus://history"
+navegar()
+}
 
-document.getElementById("menuConfiguracoes").onclick = ()=> alert("Configurações em desenvolvimento")
+document.getElementById("menuDownloads").onclick = ()=>{
+urlBar.value = "nexus://downloads"
+navegar()
+}
 
-document.getElementById("menuAjuda").onclick = ()=> alert("Nexus Browser")
+document.getElementById("menuFavoritos").onclick = ()=>{
+urlBar.value = "nexus://favorites"
+navegar()
+}
+
+document.getElementById("menuConfiguracoes").onclick = ()=>{
+urlBar.value = "nexus://settings"
+navegar()
+}
+
+document.getElementById("menuAjuda").onclick = ()=>{
+urlBar.value = "https://www.google.com/search?q=Nexus+Browser+ajuda"
+navegar()
+}
 
 })
 
