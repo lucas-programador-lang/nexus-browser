@@ -5,14 +5,35 @@ const { contextBridge, ipcRenderer } = require("electron")
 // =======================================
 
 window.addEventListener("DOMContentLoaded", () => {
-
 console.log("🚀 Nexus Browser iniciado")
-
 })
 
 
 // =======================================
-// API PRINCIPAL DO NAVEGADOR
+// CANAIS PERMITIDOS (SEGURANÇA)
+// =======================================
+
+const validSendChannels = [
+"check-update"
+]
+
+const validReceiveChannels = [
+"download-progress",
+"download-complete"
+]
+
+const validInvokeChannels = [
+"get-history",
+"get-favorites",
+"add-favorite",
+"get-settings",
+"save-settings",
+"ask-ai"
+]
+
+
+// =======================================
+// API DO NAVEGADOR
 // =======================================
 
 contextBridge.exposeInMainWorld("nexus", {
@@ -35,27 +56,6 @@ addFavorite: (data) => ipcRenderer.invoke("add-favorite", data),
 
 
 // ===============================
-// DOWNLOADS
-// ===============================
-
-onDownloadProgress: (callback) => {
-
-ipcRenderer.on("download-progress", (event, percent) => {
-callback(percent)
-})
-
-},
-
-onDownloadComplete: (callback) => {
-
-ipcRenderer.on("download-complete", (event, file) => {
-callback(file)
-})
-
-},
-
-
-// ===============================
 // CONFIGURAÇÕES
 // ===============================
 
@@ -68,23 +68,43 @@ saveSettings: (data) => ipcRenderer.invoke("save-settings", data),
 // IA DO NAVEGADOR
 // ===============================
 
-askAI: (prompt) => ipcRenderer.invoke("ask-ai", prompt)
+askAI: (prompt) => ipcRenderer.invoke("ask-ai", prompt),
 
+
+// ===============================
+// DOWNLOAD PROGRESS
+// ===============================
+
+onDownloadProgress: (callback) => {
+
+ipcRenderer.removeAllListeners("download-progress")
+
+ipcRenderer.on("download-progress",(event,percent)=>{
+callback(percent)
 })
 
-
-// =======================================
-// API PARA ATUALIZAÇÃO DO NAVEGADOR
-// =======================================
-
-contextBridge.exposeInMainWorld("nexusAPI", {
-
-send: (channel, data) => {
-ipcRenderer.send(channel, data)
 },
 
-receive: (channel, func) => {
-ipcRenderer.on(channel, (event, ...args) => func(...args))
-}
+
+// ===============================
+// DOWNLOAD COMPLETO
+// ===============================
+
+onDownloadComplete: (callback) => {
+
+ipcRenderer.removeAllListeners("download-complete")
+
+ipcRenderer.on("download-complete",(event,file)=>{
+callback(file)
+})
+
+},
+
+
+// ===============================
+// ATUALIZAÇÃO
+// ===============================
+
+checkUpdate: () => ipcRenderer.send("check-update")
 
 })
