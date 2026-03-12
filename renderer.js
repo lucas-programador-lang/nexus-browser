@@ -21,21 +21,16 @@ btnAvancar = document.getElementById("btnAvancar")
 btnRecarregar = document.getElementById("btnRecarregar")
 btnIr = document.getElementById("btnIr")
 
+// ENTER na barra
 if(urlBar){
-
 urlBar.addEventListener("keydown",(e)=>{
-
 if(e.key === "Enter"){
 navegar()
 }
-
 })
-
 }
 
-
 // BOTÕES
-
 btnVoltar?.addEventListener("click", voltar)
 btnAvancar?.addEventListener("click", avancar)
 btnRecarregar?.addEventListener("click", recarregar)
@@ -57,7 +52,22 @@ let urlInput = urlBar.value.trim()
 if(!urlInput) return
 
 
-// PESQUISA AUTOMÁTICA
+// =======================================
+// PÁGINAS INTERNAS
+// =======================================
+
+if(urlInput.startsWith("nexus://")){
+
+abrirPaginaInterna(urlInput)
+
+return
+
+}
+
+
+// =======================================
+// PESQUISA INTELIGENTE
+// =======================================
 
 if(!urlInput.includes(".")){
 
@@ -87,7 +97,7 @@ verificarSite(urlInput)
 }
 
 
-// ABA ATIVA
+// VERIFICAR ABA
 
 if(!abaAtual || !abaAtual.webview){
 console.warn("Nenhuma aba ativa")
@@ -95,7 +105,7 @@ return
 }
 
 
-// EVITAR RELOAD DA MESMA URL
+// EVITAR RELOAD
 
 try{
 
@@ -106,7 +116,7 @@ return
 }catch(e){}
 
 
-// CARREGAR
+// NAVEGAR
 
 try{
 
@@ -114,7 +124,7 @@ abaAtual.webview.loadURL(urlInput)
 
 }catch(err){
 
-console.error("Erro ao navegar:",err)
+console.error("Erro navegar:",err)
 
 }
 
@@ -122,7 +132,67 @@ console.error("Erro ao navegar:",err)
 
 
 // =======================================
-// ATUALIZAR URL
+// PÁGINAS INTERNAS DO NAVEGADOR
+// =======================================
+
+function abrirPaginaInterna(url){
+
+if(!abaAtual || !abaAtual.webview) return
+
+let pagina = ""
+
+if(url === "nexus://history"){
+
+pagina = `
+<h1>Histórico</h1>
+<p>Histórico do navegador.</p>
+`
+
+}
+
+else if(url === "nexus://downloads"){
+
+pagina = `
+<h1>Downloads</h1>
+<p>Gerenciador de downloads.</p>
+`
+
+}
+
+else if(url === "nexus://favorites"){
+
+pagina = `
+<h1>Favoritos</h1>
+<p>Seus sites favoritos.</p>
+`
+
+}
+
+else if(url === "nexus://settings"){
+
+pagina = `
+<h1>Configurações</h1>
+<p>Configurações do Nexus Browser.</p>
+`
+
+}
+
+else{
+
+pagina = `
+<h1>Nexus Browser</h1>
+<p>Página não encontrada.</p>
+`
+
+}
+
+abaAtual.webview.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(pagina))
+
+}
+
+
+// =======================================
+// ATUALIZAR BARRA
 // =======================================
 
 function atualizarBarra(){
@@ -216,7 +286,7 @@ console.warn("Erro reload")
 document.addEventListener("keydown",(e)=>{
 
 
-// CTRL L → barra
+// CTRL + L
 
 if(e.ctrlKey && e.key === "l"){
 
@@ -228,7 +298,7 @@ urlBar.select()
 }
 
 
-// CTRL T → nova aba
+// CTRL + T
 
 if(e.ctrlKey && e.key === "t"){
 
@@ -239,7 +309,7 @@ novaAba("https://www.google.com")
 }
 
 
-// CTRL W → fechar aba
+// CTRL + W
 
 if(e.ctrlKey && e.key === "w"){
 
@@ -252,7 +322,7 @@ fecharAba(abaAtual.id)
 }
 
 
-// CTRL R → reload
+// CTRL + R
 
 if(e.ctrlKey && e.key === "r"){
 
@@ -263,24 +333,50 @@ recarregar()
 }
 
 
-// CTRL H → histórico
+// CTRL + H
 
 if(e.ctrlKey && e.key === "h"){
 
 e.preventDefault()
 
-alert("Histórico em desenvolvimento")
+urlBar.value = "nexus://history"
+navegar()
 
 }
 
 
-// CTRL D → favoritos
+// CTRL + D
 
 if(e.ctrlKey && e.key === "d"){
 
 e.preventDefault()
 
-alert("Favoritos em desenvolvimento")
+urlBar.value = "nexus://favorites"
+navegar()
+
+}
+
+
+// CTRL + J
+
+if(e.ctrlKey && e.key === "j"){
+
+e.preventDefault()
+
+urlBar.value = "nexus://downloads"
+navegar()
+
+}
+
+
+// CTRL + ,
+
+if(e.ctrlKey && e.key === ","){
+
+e.preventDefault()
+
+urlBar.value = "nexus://settings"
+navegar()
 
 }
 
