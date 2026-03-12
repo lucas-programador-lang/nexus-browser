@@ -20,15 +20,14 @@ overflow:hidden;
 
 #logo{
 position:absolute;
-top:10px;
+top:9px;
 left:10px;
 width:28px;
 height:28px;
-border-radius:8px;
-box-shadow:0 2px 8px rgba(0,0,0,0.5);
+border-radius:6px;
+box-shadow:0 3px 10px rgba(0,0,0,0.5);
 z-index:1000;
 pointer-events:none;
-opacity:0.95;
 }
 
 
@@ -41,14 +40,8 @@ display:flex;
 align-items:center;
 gap:8px;
 padding:8px 12px;
-padding-left:50px;
-
-background:linear-gradient(
-to bottom,
-#020617,
-#020617
-);
-
+padding-left:46px;
+background:#020617;
 border-bottom:1px solid #1e293b;
 height:48px;
 box-sizing:border-box;
@@ -56,7 +49,7 @@ box-sizing:border-box;
 
 
 /* ============================= */
-/* CONTROLES */
+/* CONTROLES NAVEGAÇÃO */
 /* ============================= */
 
 .nav-controls{
@@ -70,22 +63,30 @@ gap:6px;
 /* ============================= */
 
 #url{
+
 flex:1;
-height:36px;
-padding:0 16px;
+
+height:38px;
+
+padding:0 18px;
 
 font-size:14px;
 
-border-radius:10px;
+border-radius:12px;
+
 border:none;
+
 outline:none;
 
 background:#1e293b;
+
 color:white;
+
+box-shadow:
+inset 0 0 0 1px #334155;
 
 transition:all 0.2s ease;
 
-box-shadow:inset 0 0 0 1px #334155;
 }
 
 #url:focus{
@@ -104,63 +105,34 @@ inset 0 0 0 1px #475569;
 /* ============================= */
 
 button{
-
-height:34px;
-min-width:34px;
-
+height:36px;
+min-width:36px;
 padding:0 10px;
-
 border:none;
 border-radius:8px;
-
 font-size:14px;
-
 display:flex;
 align-items:center;
 justify-content:center;
-
 cursor:pointer;
-
-transition:all 0.15s ease;
-
+background:#1f2937;
 color:white;
+transition:all 0.15s ease;
+}
 
+button:hover{
+background:#374151;
 }
 
 
 /* ============================= */
-/* ÍCONES */
+/* ÍCONES BOTÕES */
 /* ============================= */
 
 button img{
 width:18px;
 height:18px;
 pointer-events:none;
-}
-
-
-/* ============================= */
-/* BOTÕES NAVEGAÇÃO */
-/* ============================= */
-
-#btnVoltar,
-#btnAvancar,
-#btnRecarregar{
-
-background:#1f2937;
-
-width:34px;
-
-}
-
-#btnVoltar:hover,
-#btnAvancar:hover,
-#btnRecarregar:hover{
-
-background:#374151;
-
-transform:scale(1.05);
-
 }
 
 
@@ -174,50 +146,6 @@ gap:6px;
 }
 
 
-/* IR */
-
-#btnIr{
-background:#2563eb;
-}
-
-#btnIr:hover{
-background:#1d4ed8;
-}
-
-
-/* IA */
-
-#btnIA{
-background:#7c3aed;
-}
-
-#btnIA:hover{
-background:#6d28d9;
-}
-
-
-/* ESTUDO */
-
-#btnEstudo{
-background:#0891b2;
-}
-
-#btnEstudo:hover{
-background:#0e7490;
-}
-
-
-/* NOVA ABA */
-
-#btnNovaAba{
-background:#16a34a;
-}
-
-#btnNovaAba:hover{
-background:#15803d;
-}
-
-
 /* ============================= */
 /* MENU */
 /* ============================= */
@@ -228,19 +156,12 @@ align-items:center;
 }
 
 #btnMenu{
-
 background:#1f2937;
-
-width:34px;
-
+width:36px;
 }
 
 #btnMenu:hover{
-
 background:#374151;
-
-transform:scale(1.05);
-
 }
 
 
@@ -249,48 +170,29 @@ transform:scale(1.05);
 /* ============================= */
 
 .menu-dropdown{
-
 position:absolute;
-
 top:50px;
 right:12px;
-
 background:#111827;
-
 border:1px solid #1e293b;
-
 border-radius:10px;
-
 width:220px;
-
 display:none;
-
 flex-direction:column;
-
 z-index:2000;
-
 box-shadow:0 12px 30px rgba(0,0,0,0.5);
-
 overflow:hidden;
-
 }
 
 .menu-item{
-
 padding:12px 14px;
-
 cursor:pointer;
-
 font-size:14px;
-
 transition:background 0.15s;
-
 }
 
 .menu-item:hover{
-
 background:#1f2937;
-
 }
 
 
@@ -299,23 +201,14 @@ background:#1f2937;
 /* ============================= */
 
 #tabs{
-
 display:flex;
-
 align-items:center;
-
 background:#020617;
-
 padding:6px;
-
 overflow-x:auto;
-
 border-bottom:1px solid #1e293b;
-
-height:40px;
-
+height:42px;
 box-sizing:border-box;
-
 }
 
 
@@ -327,27 +220,27 @@ box-sizing:border-box;
 
 background:#1f2937;
 
-color:#e5e7eb;
+padding:8px 14px;
 
-padding:6px 12px;
+border-radius:10px;
 
-margin-right:6px;
+min-width:140px;
 
-border-radius:8px;
+max-width:240px;
 
-cursor:pointer;
+font-size:14px;
 
 display:flex;
 
 align-items:center;
 
-gap:6px;
+gap:8px;
 
-font-size:13px;
+cursor:pointer;
 
-min-width:120px;
+color:#e5e7eb;
 
-max-width:200px;
+transition:all 0.15s ease;
 
 white-space:nowrap;
 
@@ -355,14 +248,10 @@ overflow:hidden;
 
 text-overflow:ellipsis;
 
-transition:all 0.15s ease;
-
 }
 
 .tab:hover{
-
 background:#374151;
-
 }
 
 
@@ -371,13 +260,9 @@ background:#374151;
 /* ============================= */
 
 .active-tab{
-
 background:#2563eb;
-
 color:white;
-
-box-shadow:0 3px 10px rgba(0,0,0,0.5);
-
+box-shadow:0 2px 6px rgba(0,0,0,0.4);
 }
 
 
@@ -386,10 +271,8 @@ box-shadow:0 3px 10px rgba(0,0,0,0.5);
 /* ============================= */
 
 .tab img{
-
 width:16px;
 height:16px;
-
 }
 
 
@@ -398,41 +281,28 @@ height:16px;
 /* ============================= */
 
 .close-tab{
-
 margin-left:auto;
-
 color:#cbd5f5;
-
-font-size:13px;
-
+font-size:14px;
 cursor:pointer;
-
 }
 
 .close-tab:hover{
-
 color:white;
-
 }
 
 
 /* ============================= */
-/* ÁREA NAVEGADOR */
+/* ÁREA DO NAVEGADOR */
 /* ============================= */
 
 #browser-container{
-
 flex:1;
-
 width:100%;
 height:100%;
-
 position:relative;
-
 background:#020617;
-
 overflow:hidden;
-
 }
 
 
@@ -441,22 +311,17 @@ overflow:hidden;
 /* ============================= */
 
 webview{
-
 position:absolute;
-
 top:0;
 left:0;
-
 width:100%;
 height:100%;
-
 border:none;
-
 }
 
 
 /* ============================= */
-/* SCROLL ABAS */
+/* SCROLL DAS ABAS */
 /* ============================= */
 
 #tabs::-webkit-scrollbar{
