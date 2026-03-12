@@ -19,14 +19,24 @@
 <!-- BARRA SUPERIOR -->
 <div class="topbar">
 
+<!-- CONTROLES -->
 <div class="nav-controls">
 
-<button id="btnVoltar" title="Voltar">←</button>
-<button id="btnAvancar" title="Avançar">→</button>
-<button id="btnRecarregar" title="Recarregar">⟳</button>
+<button id="btnVoltar" title="Voltar">
+<img src="assets/icons/back.svg">
+</button>
+
+<button id="btnAvancar" title="Avançar">
+<img src="assets/icons/forward.svg">
+</button>
+
+<button id="btnRecarregar" title="Recarregar">
+<img src="assets/icons/reload.svg">
+</button>
 
 </div>
 
+<!-- BARRA URL -->
 <input
 id="url"
 type="text"
@@ -34,25 +44,48 @@ placeholder="Pesquisar ou digitar URL"
 autocomplete="off"
 />
 
+<!-- BOTÕES -->
 <div class="nav-buttons">
 
-<button id="btnIr" title="Ir">🌐</button>
-<button id="btnIA" title="Assistente IA">🤖</button>
-<button id="btnEstudo" title="Modo Estudo">📖</button>
-<button id="btnNovaAba" title="Nova Aba">＋</button>
+<button id="btnIr" title="Ir">
+<img src="assets/icons/search.svg">
+</button>
+
+<button id="btnIA" title="Assistente IA">
+<img src="assets/icons/ai.svg">
+</button>
+
+<button id="btnEstudo" title="Modo Estudo">
+<img src="assets/icons/book.svg">
+</button>
+
+<button id="btnNovaAba" title="Nova Aba">
+<img src="assets/icons/plus.svg">
+</button>
 
 </div>
 
+<!-- MENU -->
 <div class="menu-area">
-<button id="btnMenu" title="Menu">☰</button>
-</div>
+
+<button id="btnMenu" title="Menu">
+<img src="assets/icons/menu.svg">
+</button>
 
 </div>
 
+</div>
+
+
+<!-- ABAS -->
 <div id="tabs"></div>
 
+
+<!-- NAVEGADOR -->
 <div id="browser-container"></div>
 
+
+<!-- MENU -->
 <div id="menuDropdown" class="menu-dropdown">
 
 <div class="menu-item" id="menuNovaGuia">Nova guia</div>
@@ -65,6 +98,8 @@ autocomplete="off"
 
 </div>
 
+
+<!-- SCRIPTS -->
 <script src="tabs.js"></script>
 <script src="renderer.js"></script>
 <script src="ai.js"></script>
@@ -74,87 +109,13 @@ autocomplete="off"
 
 window.addEventListener("DOMContentLoaded", () => {
 
-const urlBar = document.getElementById("url")
-
-const btnIr = document.getElementById("btnIr")
-const btnNovaAba = document.getElementById("btnNovaAba")
-const btnVoltar = document.getElementById("btnVoltar")
-const btnAvancar = document.getElementById("btnAvancar")
-const btnRecarregar = document.getElementById("btnRecarregar")
-
-const btnIA = document.getElementById("btnIA")
-const btnEstudo = document.getElementById("btnEstudo")
-
-const btnMenu = document.getElementById("btnMenu")
 const menu = document.getElementById("menuDropdown")
+const btnMenu = document.getElementById("btnMenu")
 
 // primeira aba
 novaAba("https://www.google.com")
 
-// navegar
-btnIr.addEventListener("click", navegar)
-
-urlBar.addEventListener("keydown",(e)=>{
-
-if(e.key === "Enter"){
-navegar()
-}
-
-})
-
-// nova aba
-btnNovaAba.addEventListener("click",()=>{
-
-novaAba("https://www.google.com")
-
-})
-
-// voltar
-btnVoltar.addEventListener("click",()=>{
-
-if(abaAtual && abaAtual.webview && abaAtual.webview.canGoBack()){
-abaAtual.webview.goBack()
-}
-
-})
-
-// avançar
-btnAvancar.addEventListener("click",()=>{
-
-if(abaAtual && abaAtual.webview && abaAtual.webview.canGoForward()){
-abaAtual.webview.goForward()
-}
-
-})
-
-// recarregar
-btnRecarregar.addEventListener("click",()=>{
-
-if(abaAtual && abaAtual.webview){
-abaAtual.webview.reload()
-}
-
-})
-
-// IA
-btnIA.addEventListener("click",()=>{
-
-if(typeof resumir === "function"){
-resumir()
-}
-
-})
-
-// modo estudo
-btnEstudo.addEventListener("click",()=>{
-
-if(typeof modoEstudo === "function"){
-modoEstudo()
-}
-
-})
-
-// menu
+// abrir menu
 btnMenu.addEventListener("click",(e)=>{
 
 e.stopPropagation()
@@ -176,33 +137,19 @@ menu.style.display="none"
 })
 
 // ações do menu
-document.getElementById("menuNovaGuia").onclick = ()=>{
-novaAba("https://www.google.com")
-}
+document.getElementById("menuNovaGuia").onclick = ()=> novaAba("https://www.google.com")
 
-document.getElementById("menuNovaJanela").onclick = ()=>{
-alert("Nova janela em desenvolvimento")
-}
+document.getElementById("menuNovaJanela").onclick = ()=> alert("Nova janela em desenvolvimento")
 
-document.getElementById("menuHistorico").onclick = ()=>{
-alert("Histórico em desenvolvimento")
-}
+document.getElementById("menuHistorico").onclick = ()=> alert("Histórico em desenvolvimento")
 
-document.getElementById("menuDownloads").onclick = ()=>{
-alert("Downloads em desenvolvimento")
-}
+document.getElementById("menuDownloads").onclick = ()=> alert("Downloads em desenvolvimento")
 
-document.getElementById("menuFavoritos").onclick = ()=>{
-alert("Favoritos em desenvolvimento")
-}
+document.getElementById("menuFavoritos").onclick = ()=> alert("Favoritos em desenvolvimento")
 
-document.getElementById("menuConfiguracoes").onclick = ()=>{
-alert("Configurações em desenvolvimento")
-}
+document.getElementById("menuConfiguracoes").onclick = ()=> alert("Configurações em desenvolvimento")
 
-document.getElementById("menuAjuda").onclick = ()=>{
-alert("Nexus Browser - Ajuda")
-}
+document.getElementById("menuAjuda").onclick = ()=> alert("Nexus Browser")
 
 })
 
