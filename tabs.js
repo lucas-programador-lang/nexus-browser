@@ -6,6 +6,59 @@ let abas = []
 let abaAtual = null
 let contadorAbas = 0
 
+const SESSION_KEY = "nexus_tabs_session"
+
+
+// =======================================
+// SALVAR SESSÃO
+// =======================================
+
+function salvarSessao(){
+
+const dados = abas.map(a => {
+
+try{
+return a.webview.getURL()
+}catch(e){
+return "https://www.google.com"
+}
+
+})
+
+localStorage.setItem(SESSION_KEY, JSON.stringify(dados))
+
+}
+
+
+// =======================================
+// RESTAURAR SESSÃO
+// =======================================
+
+function restaurarSessao(){
+
+const dados = localStorage.getItem(SESSION_KEY)
+
+if(!dados){
+
+novaAba("https://www.google.com")
+return
+
+}
+
+try{
+
+const urls = JSON.parse(dados)
+
+urls.forEach(url => novaAba(url))
+
+}catch(e){
+
+novaAba("https://www.google.com")
+
+}
+
+}
+
 
 // =======================================
 // NOVA ABA
@@ -16,19 +69,14 @@ function novaAba(url = "https://www.google.com") {
 const browserContainer = document.getElementById("browser-container")
 const tabsContainer = document.getElementById("tabs")
 
-if(!browserContainer || !tabsContainer){
-console.warn("Containers não encontrados")
-return
-}
+if(!browserContainer || !tabsContainer) return
 
 contadorAbas++
 
 const id = "tab-" + contadorAbas
 
 
-// =======================================
-// BOTÃO DA ABA
-// =======================================
+// BOTÃO ABA
 
 const tabButton = document.createElement("div")
 tabButton.className = "tab"
@@ -61,7 +109,7 @@ fecharAba(id)
 }
 
 
-// montar aba
+// montar
 
 tabButton.appendChild(icon)
 tabButton.appendChild(titulo)
@@ -72,9 +120,7 @@ tabButton.onclick = ()=> trocarAba(id)
 tabsContainer.appendChild(tabButton)
 
 
-// =======================================
 // WEBVIEW
-// =======================================
 
 const webview = document.createElement("webview")
 
@@ -82,12 +128,10 @@ webview.src = url
 webview.className = "browser-view"
 webview.id = "view-" + id
 
-webview.style.width = "100%"
-webview.style.height = "100%"
-webview.style.display = "none"
+webview.style.display="none"
 
 
-// título da página
+// título
 
 webview.addEventListener("page-title-updated",(e)=>{
 
@@ -98,7 +142,7 @@ titulo.innerText = e.title.substring(0,25)
 })
 
 
-// favicon da página
+// favicon
 
 webview.addEventListener("page-favicon-updated",(e)=>{
 
@@ -109,34 +153,23 @@ icon.src = e.favicons[0]
 })
 
 
-// atualizar barra de URL
+// atualizar barra
 
-webview.addEventListener("did-navigate", ()=>{
+webview.addEventListener("did-navigate", atualizarBarra)
+webview.addEventListener("did-navigate-in-page", atualizarBarra)
+webview.addEventListener("did-finish-load", atualizarBarra)
 
-if(typeof atualizarBarra === "function"){
-atualizarBarra()
-}
 
-})
+// detectar crash
 
-webview.addEventListener("did-navigate-in-page", ()=>{
+webview.addEventListener("crashed", ()=>{
 
-if(typeof atualizarBarra === "function"){
-atualizarBarra()
-}
-
-})
-
-webview.addEventListener("did-finish-load", ()=>{
-
-if(typeof atualizarBarra === "function"){
-atualizarBarra()
-}
+alert("A aba travou.")
 
 })
 
 
-// abrir links externos em nova aba
+// abrir nova aba
 
 webview.addEventListener("new-window",(e)=>{
 
@@ -147,12 +180,12 @@ novaAba(e.url)
 })
 
 
-// adicionar ao navegador
+// adicionar
 
 browserContainer.appendChild(webview)
 
 
-// salvar aba
+// salvar
 
 abas.push({
 
@@ -163,12 +196,13 @@ webview:webview
 })
 
 
-// ativar aba
+// ativar
 
 trocarAba(id)
 
-}
+salvarSessao()
 
+}
 
 
 // =======================================
@@ -200,7 +234,6 @@ atualizarBarra()
 }
 
 
-
 // =======================================
 // FECHAR ABA
 // =======================================
@@ -213,21 +246,12 @@ if(index === -1) return
 
 const aba = abas[index]
 
-// remover elementos
-
 try{
 aba.webview.remove()
 aba.botao.remove()
-}catch(err){
-console.warn("Erro ao remover aba")
-}
-
-// remover da lista
+}catch(e){}
 
 abas.splice(index,1)
-
-
-// se ainda existem abas
 
 if(abas.length){
 
@@ -241,4 +265,36 @@ novaAba()
 
 }
 
+salvarSessao()
+
 }
+
+
+// =======================================
+// DUPLO CLIQUE NOVA ABA
+// =======================================
+
+document.addEventListener("dblclick",(e)=>{
+
+if(e.target.id === "tabs"){
+novaAba()
+}
+
+})
+
+
+// =======================================
+// RESTAURAR AO INICIAR
+// =======================================
+
+window.addEventListener("DOMContentLoaded",()=>{
+
+setTimeout(()=>{
+
+if(abas.length===0){
+restaurarSessao()
+}
+
+},200)
+
+})
