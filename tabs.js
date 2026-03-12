@@ -3,7 +3,7 @@
 // =======================================
 
 let abas = []
-let abaAtual = null
+window.abaAtual = null
 let contadorAbas = 0
 
 const SESSION_KEY = "nexus_tabs_session"
@@ -14,6 +14,8 @@ const SESSION_KEY = "nexus_tabs_session"
 // =======================================
 
 function salvarSessao(){
+
+try{
 
 const dados = abas.map(a => {
 
@@ -27,6 +29,10 @@ return "https://www.google.com"
 
 localStorage.setItem(SESSION_KEY, JSON.stringify(dados))
 
+}catch(e){
+console.warn("Erro salvar sessão")
+}
+
 }
 
 
@@ -39,15 +45,18 @@ function restaurarSessao(){
 const dados = localStorage.getItem(SESSION_KEY)
 
 if(!dados){
-
 novaAba("https://www.google.com")
 return
-
 }
 
 try{
 
 const urls = JSON.parse(dados)
+
+if(!urls.length){
+novaAba("https://www.google.com")
+return
+}
 
 urls.forEach(url => novaAba(url))
 
@@ -76,7 +85,9 @@ contadorAbas++
 const id = "tab-" + contadorAbas
 
 
-// BOTÃO ABA
+// =======================================
+// BOTÃO DA ABA
+// =======================================
 
 const tabButton = document.createElement("div")
 tabButton.className = "tab"
@@ -109,7 +120,7 @@ fecharAba(id)
 }
 
 
-// montar
+// montar aba
 
 tabButton.appendChild(icon)
 tabButton.appendChild(titulo)
@@ -120,18 +131,19 @@ tabButton.onclick = ()=> trocarAba(id)
 tabsContainer.appendChild(tabButton)
 
 
+// =======================================
 // WEBVIEW
+// =======================================
 
 const webview = document.createElement("webview")
 
 webview.src = url
 webview.className = "browser-view"
 webview.id = "view-" + id
-
 webview.style.display="none"
 
 
-// título
+// título da página
 
 webview.addEventListener("page-title-updated",(e)=>{
 
@@ -142,7 +154,7 @@ titulo.innerText = e.title.substring(0,25)
 })
 
 
-// favicon
+// favicon da página
 
 webview.addEventListener("page-favicon-updated",(e)=>{
 
@@ -153,54 +165,67 @@ icon.src = e.favicons[0]
 })
 
 
-// atualizar barra
+// atualizar barra de URL
 
-webview.addEventListener("did-navigate", atualizarBarra)
-webview.addEventListener("did-navigate-in-page", atualizarBarra)
-webview.addEventListener("did-finish-load", atualizarBarra)
+webview.addEventListener("did-navigate", ()=>{
+if(typeof atualizarBarra === "function"){
+atualizarBarra()
+}
+})
+
+webview.addEventListener("did-navigate-in-page", ()=>{
+if(typeof atualizarBarra === "function"){
+atualizarBarra()
+}
+})
+
+webview.addEventListener("did-finish-load", ()=>{
+if(typeof atualizarBarra === "function"){
+atualizarBarra()
+}
+})
 
 
 // detectar crash
 
 webview.addEventListener("crashed", ()=>{
-
 alert("A aba travou.")
-
 })
 
 
-// abrir nova aba
+// abrir links em nova aba
 
 webview.addEventListener("new-window",(e)=>{
-
 if(e.url){
 novaAba(e.url)
 }
-
 })
 
 
-// adicionar
+// adicionar ao navegador
 
 browserContainer.appendChild(webview)
 
 
-// salvar
+// salvar aba
 
 abas.push({
-
 id:id,
 botao:tabButton,
 webview:webview
-
 })
 
 
-// ativar
+// ativar aba
 
 trocarAba(id)
 
+
+// salvar sessão
+
+setTimeout(()=>{
 salvarSessao()
+},500)
 
 }
 
@@ -225,7 +250,7 @@ if(!aba) return
 aba.webview.style.display="flex"
 aba.botao.classList.add("active-tab")
 
-abaAtual = aba
+window.abaAtual = aba
 
 if(typeof atualizarBarra === "function"){
 atualizarBarra()
@@ -253,6 +278,9 @@ aba.botao.remove()
 
 abas.splice(index,1)
 
+
+// se ainda existem abas
+
 if(abas.length){
 
 const novaIndex = Math.max(0,index-1)
@@ -261,7 +289,7 @@ trocarAba(abas[novaIndex].id)
 
 }else{
 
-novaAba()
+novaAba("https://www.google.com")
 
 }
 
