@@ -22,8 +22,8 @@ overflow:hidden;
 position:absolute;
 top:10px;
 left:10px;
-width:26px;
-height:26px;
+width:24px;
+height:24px;
 z-index:1000;
 pointer-events:none;
 }
