@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 
 <head>
 
@@ -13,38 +13,19 @@
 
 <body>
 
-<!-- ===================== -->
 <!-- LOGO -->
-<!-- ===================== -->
-
 <img src="assets/logo.png" id="logo">
 
-<!-- ===================== -->
 <!-- BARRA SUPERIOR -->
-<!-- ===================== -->
-
 <div class="topbar">
-
-<!-- CONTROLES DE NAVEGAÇÃO -->
 
 <div class="nav-controls">
 
-<button id="btnVoltar" title="Voltar">
-←
-</button>
-
-<button id="btnAvancar" title="Avançar">
-→
-</button>
-
-<button id="btnRecarregar" title="Recarregar">
-⟳
-</button>
+<button id="btnVoltar" title="Voltar">←</button>
+<button id="btnAvancar" title="Avançar">→</button>
+<button id="btnRecarregar" title="Recarregar">⟳</button>
 
 </div>
-
-
-<!-- BARRA DE URL -->
 
 <input
 id="url"
@@ -53,77 +34,36 @@ placeholder="Pesquisar ou digitar URL"
 autocomplete="off"
 />
 
-
-<!-- BOTÕES PRINCIPAIS -->
-
 <div class="nav-buttons">
 
-<button id="btnIr" title="Ir">
-🌐
-</button>
-
-<button id="btnIA" title="Assistente IA">
-🤖
-</button>
-
-<button id="btnEstudo" title="Modo Estudo">
-📖
-</button>
-
-<button id="btnNovaAba" title="Nova Aba">
-＋
-</button>
+<button id="btnIr" title="Ir">🌐</button>
+<button id="btnIA" title="Assistente IA">🤖</button>
+<button id="btnEstudo" title="Modo Estudo">📖</button>
+<button id="btnNovaAba" title="Nova Aba">＋</button>
 
 </div>
-
-
-<!-- MENU -->
 
 <div class="menu-area">
-
-<button id="btnMenu" title="Menu">
-☰
-</button>
-
+<button id="btnMenu" title="Menu">☰</button>
 </div>
 
 </div>
-
-
-<!-- ===================== -->
-<!-- ABAS -->
-<!-- ===================== -->
 
 <div id="tabs"></div>
 
-
-<!-- ===================== -->
-<!-- NAVEGADOR -->
-<!-- ===================== -->
-
 <div id="browser-container"></div>
-
-
-<!-- ===================== -->
-<!-- MENU DROPDOWN -->
-<!-- ===================== -->
 
 <div id="menuDropdown" class="menu-dropdown">
 
-<div class="menu-item">Nova guia</div>
-<div class="menu-item">Nova janela</div>
-<div class="menu-item">Histórico</div>
-<div class="menu-item">Downloads</div>
-<div class="menu-item">Favoritos</div>
-<div class="menu-item">Configurações</div>
-<div class="menu-item">Ajuda</div>
+<div class="menu-item" id="menuNovaGuia">Nova guia</div>
+<div class="menu-item" id="menuNovaJanela">Nova janela</div>
+<div class="menu-item" id="menuHistorico">Histórico</div>
+<div class="menu-item" id="menuDownloads">Downloads</div>
+<div class="menu-item" id="menuFavoritos">Favoritos</div>
+<div class="menu-item" id="menuConfiguracoes">Configurações</div>
+<div class="menu-item" id="menuAjuda">Ajuda</div>
 
 </div>
-
-
-<!-- ===================== -->
-<!-- SCRIPTS -->
-<!-- ===================== -->
 
 <script src="tabs.js"></script>
 <script src="renderer.js"></script>
@@ -134,14 +74,90 @@ autocomplete="off"
 
 window.addEventListener("DOMContentLoaded", () => {
 
+const urlBar = document.getElementById("url")
+
+const btnIr = document.getElementById("btnIr")
+const btnNovaAba = document.getElementById("btnNovaAba")
+const btnVoltar = document.getElementById("btnVoltar")
+const btnAvancar = document.getElementById("btnAvancar")
+const btnRecarregar = document.getElementById("btnRecarregar")
+
+const btnIA = document.getElementById("btnIA")
+const btnEstudo = document.getElementById("btnEstudo")
+
 const btnMenu = document.getElementById("btnMenu")
 const menu = document.getElementById("menuDropdown")
 
 // primeira aba
 novaAba("https://www.google.com")
 
-// abrir menu
-btnMenu.addEventListener("click", () => {
+// navegar
+btnIr.addEventListener("click", navegar)
+
+urlBar.addEventListener("keydown",(e)=>{
+
+if(e.key === "Enter"){
+navegar()
+}
+
+})
+
+// nova aba
+btnNovaAba.addEventListener("click",()=>{
+
+novaAba("https://www.google.com")
+
+})
+
+// voltar
+btnVoltar.addEventListener("click",()=>{
+
+if(abaAtual && abaAtual.webview && abaAtual.webview.canGoBack()){
+abaAtual.webview.goBack()
+}
+
+})
+
+// avançar
+btnAvancar.addEventListener("click",()=>{
+
+if(abaAtual && abaAtual.webview && abaAtual.webview.canGoForward()){
+abaAtual.webview.goForward()
+}
+
+})
+
+// recarregar
+btnRecarregar.addEventListener("click",()=>{
+
+if(abaAtual && abaAtual.webview){
+abaAtual.webview.reload()
+}
+
+})
+
+// IA
+btnIA.addEventListener("click",()=>{
+
+if(typeof resumir === "function"){
+resumir()
+}
+
+})
+
+// modo estudo
+btnEstudo.addEventListener("click",()=>{
+
+if(typeof modoEstudo === "function"){
+modoEstudo()
+}
+
+})
+
+// menu
+btnMenu.addEventListener("click",(e)=>{
+
+e.stopPropagation()
 
 menu.style.display =
 menu.style.display === "block"
@@ -150,7 +166,7 @@ menu.style.display === "block"
 
 })
 
-// fechar menu ao clicar fora
+// fechar menu
 document.addEventListener("click",(e)=>{
 
 if(!btnMenu.contains(e.target) && !menu.contains(e.target)){
@@ -158,6 +174,35 @@ menu.style.display="none"
 }
 
 })
+
+// ações do menu
+document.getElementById("menuNovaGuia").onclick = ()=>{
+novaAba("https://www.google.com")
+}
+
+document.getElementById("menuNovaJanela").onclick = ()=>{
+alert("Nova janela em desenvolvimento")
+}
+
+document.getElementById("menuHistorico").onclick = ()=>{
+alert("Histórico em desenvolvimento")
+}
+
+document.getElementById("menuDownloads").onclick = ()=>{
+alert("Downloads em desenvolvimento")
+}
+
+document.getElementById("menuFavoritos").onclick = ()=>{
+alert("Favoritos em desenvolvimento")
+}
+
+document.getElementById("menuConfiguracoes").onclick = ()=>{
+alert("Configurações em desenvolvimento")
+}
+
+document.getElementById("menuAjuda").onclick = ()=>{
+alert("Nexus Browser - Ajuda")
+}
 
 })
 
