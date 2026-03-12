@@ -8,6 +8,11 @@ let btnAvancar = null
 let btnRecarregar = null
 let btnIr = null
 
+
+// =======================================
+// INICIAR
+// =======================================
+
 window.addEventListener("DOMContentLoaded", () => {
 
 urlBar = document.getElementById("url")
@@ -17,19 +22,35 @@ btnRecarregar = document.getElementById("btnRecarregar")
 btnIr = document.getElementById("btnIr")
 
 // ENTER na barra
+
 if(urlBar){
 urlBar.addEventListener("keydown",(e)=>{
+
 if(e.key === "Enter"){
 navegar()
 }
+
 })
 }
 
-// botões
-if(btnVoltar) btnVoltar.addEventListener("click",voltar)
-if(btnAvancar) btnAvancar.addEventListener("click",avancar)
-if(btnRecarregar) btnRecarregar.addEventListener("click",recarregar)
-if(btnIr) btnIr.addEventListener("click",navegar)
+
+// BOTÕES
+
+if(btnVoltar){
+btnVoltar.addEventListener("click",voltar)
+}
+
+if(btnAvancar){
+btnAvancar.addEventListener("click",avancar)
+}
+
+if(btnRecarregar){
+btnRecarregar.addEventListener("click",recarregar)
+}
+
+if(btnIr){
+btnIr.addEventListener("click",navegar)
+}
 
 })
 
@@ -50,9 +71,11 @@ if(!urlInput) return
 // PESQUISA AUTOMÁTICA
 
 if(!urlInput.includes(".")){
+
 urlInput =
 "https://www.google.com/search?q=" +
 encodeURIComponent(urlInput)
+
 }
 
 
@@ -62,26 +85,33 @@ if(
 !urlInput.startsWith("http://") &&
 !urlInput.startsWith("https://")
 ){
+
 urlInput = "https://" + urlInput
+
 }
 
 
-// SEGURANÇA
+// VERIFICAÇÃO DE SEGURANÇA
 
 if(typeof verificarSite === "function"){
+
 verificarSite(urlInput)
+
 }
 
 
-// VERIFICAR ABA
+// VERIFICAR ABA ATIVA
 
 if(!abaAtual || !abaAtual.webview){
+
 console.warn("Nenhuma aba ativa")
+
 return
+
 }
 
 
-// evitar recarregar mesma página
+// EVITAR RECARREGAR MESMA URL
 
 try{
 
@@ -92,9 +122,17 @@ return
 }catch(err){}
 
 
-// navegar
+// NAVEGAR
+
+try{
 
 abaAtual.webview.loadURL(urlInput)
+
+}catch(err){
+
+console.error("Erro ao navegar:",err)
+
+}
 
 }
 
