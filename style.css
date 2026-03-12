@@ -20,13 +20,15 @@ overflow:hidden;
 
 #logo{
 position:absolute;
-top:12px;
+top:10px;
 left:10px;
-width:26px;
-height:26px;
+width:28px;
+height:28px;
+border-radius:8px;
+box-shadow:0 2px 8px rgba(0,0,0,0.5);
 z-index:1000;
 pointer-events:none;
-opacity:0.9;
+opacity:0.95;
 }
 
 
@@ -39,8 +41,14 @@ display:flex;
 align-items:center;
 gap:8px;
 padding:8px 12px;
-padding-left:46px;
-background:#020617;
+padding-left:50px;
+
+background:linear-gradient(
+to bottom,
+#020617,
+#020617
+);
+
 border-bottom:1px solid #1e293b;
 height:48px;
 box-sizing:border-box;
@@ -48,7 +56,7 @@ box-sizing:border-box;
 
 
 /* ============================= */
-/* CONTROLES DE NAVEGAÇÃO */
+/* CONTROLES */
 /* ============================= */
 
 .nav-controls{
@@ -58,25 +66,36 @@ gap:6px;
 
 
 /* ============================= */
-/* BARRA DE URL */
+/* BARRA URL */
 /* ============================= */
 
 #url{
 flex:1;
-height:34px;
-padding:0 14px;
+height:36px;
+padding:0 16px;
+
 font-size:14px;
-border-radius:8px;
+
+border-radius:10px;
 border:none;
 outline:none;
+
 background:#1e293b;
 color:white;
+
 transition:all 0.2s ease;
+
+box-shadow:inset 0 0 0 1px #334155;
 }
 
 #url:focus{
+
 background:#334155;
-box-shadow:0 0 0 2px #2563eb;
+
+box-shadow:
+0 0 0 2px #2563eb,
+inset 0 0 0 1px #475569;
+
 }
 
 
@@ -85,23 +104,32 @@ box-shadow:0 0 0 2px #2563eb;
 /* ============================= */
 
 button{
+
 height:34px;
 min-width:34px;
+
 padding:0 10px;
+
 border:none;
-border-radius:7px;
+border-radius:8px;
+
 font-size:14px;
+
 display:flex;
 align-items:center;
 justify-content:center;
+
 cursor:pointer;
+
 transition:all 0.15s ease;
+
 color:white;
+
 }
 
 
 /* ============================= */
-/* ÍCONES BOTÕES */
+/* ÍCONES */
 /* ============================= */
 
 button img{
@@ -118,15 +146,21 @@ pointer-events:none;
 #btnVoltar,
 #btnAvancar,
 #btnRecarregar{
+
 background:#1f2937;
+
 width:34px;
+
 }
 
 #btnVoltar:hover,
 #btnAvancar:hover,
 #btnRecarregar:hover{
+
 background:#374151;
+
 transform:scale(1.05);
+
 }
 
 
@@ -194,13 +228,19 @@ align-items:center;
 }
 
 #btnMenu{
+
 background:#1f2937;
+
 width:34px;
+
 }
 
 #btnMenu:hover{
+
 background:#374151;
+
 transform:scale(1.05);
+
 }
 
 
@@ -209,29 +249,48 @@ transform:scale(1.05);
 /* ============================= */
 
 .menu-dropdown{
+
 position:absolute;
+
 top:50px;
 right:12px;
+
 background:#111827;
+
 border:1px solid #1e293b;
+
 border-radius:10px;
+
 width:220px;
+
 display:none;
+
 flex-direction:column;
+
 z-index:2000;
+
 box-shadow:0 12px 30px rgba(0,0,0,0.5);
+
 overflow:hidden;
+
 }
 
 .menu-item{
+
 padding:12px 14px;
+
 cursor:pointer;
+
 font-size:14px;
+
 transition:background 0.15s;
+
 }
 
 .menu-item:hover{
+
 background:#1f2937;
+
 }
 
 
@@ -240,14 +299,23 @@ background:#1f2937;
 /* ============================= */
 
 #tabs{
+
 display:flex;
+
 align-items:center;
+
 background:#020617;
+
 padding:6px;
+
 overflow-x:auto;
+
 border-bottom:1px solid #1e293b;
-height:38px;
+
+height:40px;
+
 box-sizing:border-box;
+
 }
 
 
@@ -256,26 +324,45 @@ box-sizing:border-box;
 /* ============================= */
 
 .tab{
+
 background:#1f2937;
+
 color:#e5e7eb;
+
 padding:6px 12px;
+
 margin-right:6px;
-border-radius:7px;
+
+border-radius:8px;
+
 cursor:pointer;
+
 display:flex;
+
 align-items:center;
+
 gap:6px;
+
 font-size:13px;
+
 min-width:120px;
+
 max-width:200px;
+
 white-space:nowrap;
+
 overflow:hidden;
+
 text-overflow:ellipsis;
+
 transition:all 0.15s ease;
+
 }
 
 .tab:hover{
+
 background:#374151;
+
 }
 
 
@@ -284,9 +371,13 @@ background:#374151;
 /* ============================= */
 
 .active-tab{
+
 background:#2563eb;
+
 color:white;
-box-shadow:0 2px 6px rgba(0,0,0,0.4);
+
+box-shadow:0 3px 10px rgba(0,0,0,0.5);
+
 }
 
 
@@ -295,24 +386,33 @@ box-shadow:0 2px 6px rgba(0,0,0,0.4);
 /* ============================= */
 
 .tab img{
+
 width:16px;
 height:16px;
+
 }
 
 
 /* ============================= */
-/* BOTÃO FECHAR ABA */
+/* FECHAR ABA */
 /* ============================= */
 
 .close-tab{
+
 margin-left:auto;
+
 color:#cbd5f5;
+
 font-size:13px;
+
 cursor:pointer;
+
 }
 
 .close-tab:hover{
+
 color:white;
+
 }
 
 
@@ -321,12 +421,18 @@ color:white;
 /* ============================= */
 
 #browser-container{
+
 flex:1;
+
 width:100%;
 height:100%;
+
 position:relative;
+
 background:#020617;
+
 overflow:hidden;
+
 }
 
 
@@ -335,17 +441,22 @@ overflow:hidden;
 /* ============================= */
 
 webview{
+
 position:absolute;
+
 top:0;
 left:0;
+
 width:100%;
 height:100%;
+
 border:none;
+
 }
 
 
 /* ============================= */
-/* SCROLL DAS ABAS */
+/* SCROLL ABAS */
 /* ============================= */
 
 #tabs::-webkit-scrollbar{
