@@ -16,6 +16,11 @@ function novaAba(url = "https://www.google.com") {
 const browserContainer = document.getElementById("browser-container")
 const tabsContainer = document.getElementById("tabs")
 
+if(!browserContainer || !tabsContainer){
+console.warn("Containers não encontrados")
+return
+}
+
 contadorAbas++
 
 const id = "tab-" + contadorAbas
@@ -77,12 +82,18 @@ webview.src = url
 webview.className = "browser-view"
 webview.id = "view-" + id
 
+webview.style.width = "100%"
+webview.style.height = "100%"
+webview.style.display = "none"
+
 
 // título da página
 
 webview.addEventListener("page-title-updated",(e)=>{
 
+if(e.title){
 titulo.innerText = e.title.substring(0,25)
+}
 
 })
 
@@ -92,9 +103,7 @@ titulo.innerText = e.title.substring(0,25)
 webview.addEventListener("page-favicon-updated",(e)=>{
 
 if(e.favicons && e.favicons.length){
-
 icon.src = e.favicons[0]
-
 }
 
 })
@@ -102,16 +111,38 @@ icon.src = e.favicons[0]
 
 // atualizar barra de URL
 
-webview.addEventListener("did-navigate", atualizarBarra)
-webview.addEventListener("did-navigate-in-page", atualizarBarra)
-webview.addEventListener("did-finish-load", atualizarBarra)
+webview.addEventListener("did-navigate", ()=>{
+
+if(typeof atualizarBarra === "function"){
+atualizarBarra()
+}
+
+})
+
+webview.addEventListener("did-navigate-in-page", ()=>{
+
+if(typeof atualizarBarra === "function"){
+atualizarBarra()
+}
+
+})
+
+webview.addEventListener("did-finish-load", ()=>{
+
+if(typeof atualizarBarra === "function"){
+atualizarBarra()
+}
+
+})
 
 
 // abrir links externos em nova aba
 
 webview.addEventListener("new-window",(e)=>{
 
+if(e.url){
 novaAba(e.url)
+}
 
 })
 
@@ -162,7 +193,9 @@ aba.botao.classList.add("active-tab")
 
 abaAtual = aba
 
+if(typeof atualizarBarra === "function"){
 atualizarBarra()
+}
 
 }
 
@@ -182,8 +215,12 @@ const aba = abas[index]
 
 // remover elementos
 
+try{
 aba.webview.remove()
 aba.botao.remove()
+}catch(err){
+console.warn("Erro ao remover aba")
+}
 
 // remover da lista
 
