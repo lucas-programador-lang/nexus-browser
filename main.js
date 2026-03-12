@@ -30,7 +30,8 @@ function carregarDados(){
 
 try{
 if(fs.existsSync(historyFile)){
-historico = JSON.parse(fs.readFileSync(historyFile))
+const data = fs.readFileSync(historyFile)
+historico = JSON.parse(data || "[]")
 }
 }catch(e){
 historico=[]
@@ -38,7 +39,8 @@ historico=[]
 
 try{
 if(fs.existsSync(favFile)){
-favoritos = JSON.parse(fs.readFileSync(favFile))
+const data = fs.readFileSync(favFile)
+favoritos = JSON.parse(data || "[]")
 }
 }catch(e){
 favoritos=[]
@@ -46,14 +48,29 @@ favoritos=[]
 
 }
 
-// salvar histórico
+
+// =======================================
+// SALVAR DADOS
+// =======================================
+
 function salvarHistorico(){
+
+try{
 fs.writeFileSync(historyFile,JSON.stringify(historico,null,2))
+}catch(e){
+console.log("Erro salvar histórico")
 }
 
-// salvar favoritos
+}
+
 function salvarFavoritos(){
+
+try{
 fs.writeFileSync(favFile,JSON.stringify(favoritos,null,2))
+}catch(e){
+console.log("Erro salvar favoritos")
+}
+
 }
 
 
@@ -78,18 +95,18 @@ webPreferences:{
 preload: path.join(__dirname,"preload.js"),
 nodeIntegration:false,
 contextIsolation:true,
-webviewTag:true
+webviewTag:true,
+sandbox:true
 }
 
 })
 
 mainWindow.loadFile("index.html")
 
-// abrir links externos no navegador
+// abrir links externos
 mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 
 shell.openExternal(url)
-
 return { action:"deny" }
 
 })
@@ -97,7 +114,9 @@ return { action:"deny" }
 mainWindow.setMenu(null)
 
 mainWindow.webContents.on("did-finish-load",()=>{
+
 mainWindow.webContents.setZoomFactor(1)
+
 })
 
 }
@@ -127,6 +146,7 @@ dialog.showErrorBox(
 )
 
 return
+
 }
 
 item.on("updated",(event,state)=>{
@@ -136,7 +156,9 @@ if(state === "progressing"){
 const percent =
 Math.round((item.getReceivedBytes()/item.getTotalBytes())*100)
 
+if(mainWindow){
 mainWindow.webContents.send("download-progress",percent)
+}
 
 }
 
@@ -148,7 +170,9 @@ if(state === "completed"){
 
 shell.showItemInFolder(item.getSavePath())
 
+if(mainWindow){
 mainWindow.webContents.send("download-complete",fileName)
+}
 
 }
 
@@ -213,6 +237,9 @@ return historico
 
 function iniciarAtualizacao(){
 
+// não roda update em modo dev
+if(!app.isPackaged) return
+
 autoUpdater.checkForUpdatesAndNotify()
 
 autoUpdater.on("checking-for-update",()=>{
@@ -236,9 +263,7 @@ type:"info",
 title:"Atualização pronta",
 message:"Atualização baixada. O navegador será reiniciado."
 }).then(()=>{
-
 autoUpdater.quitAndInstall()
-
 })
 
 })
@@ -249,7 +274,16 @@ autoUpdater.quitAndInstall()
 // botão verificar atualização
 
 ipcMain.on("check-update",()=>{
+
+if(app.isPackaged){
 autoUpdater.checkForUpdates()
+}else{
+dialog.showMessageBox({
+type:"info",
+message:"Atualizações funcionam apenas no aplicativo instalado."
+})
+}
+
 })
 
 
