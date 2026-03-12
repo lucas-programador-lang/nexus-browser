@@ -99,7 +99,7 @@ minHeight:600,
 backgroundColor:"#0f172a",
 
 // ÍCONE PROFISSIONAL
-icon: path.join(__dirname,"assets/icon.ico"),
+icon: path.join(__dirname,"assets/nexus.ico"),
 
 webPreferences:{
 preload: path.join(__dirname,"preload.js"),
