@@ -94,10 +94,10 @@ tabButton.className = "tab"
 tabButton.id = id
 
 
-// favicon
+// favicon padrão
 
 const icon = document.createElement("img")
-icon.src = "https://www.google.com/favicon.ico"
+icon.src = "assets/logo.png"
 
 
 // título
@@ -109,7 +109,7 @@ titulo.innerText = "Nova Aba"
 // botão fechar
 
 const fechar = document.createElement("span")
-fechar.innerText = "✕"
+fechar.innerHTML = "&times;"
 fechar.className = "close-tab"
 
 fechar.onclick = (e)=>{
@@ -138,6 +138,7 @@ const webview = document.createElement("webview")
 webview.src = url
 webview.className = "browser-view"
 webview.id = "view-" + id
+
 webview.style.display="none"
 webview.style.width="100%"
 webview.style.height="100%"
@@ -147,9 +148,11 @@ webview.style.height="100%"
 
 webview.addEventListener("page-title-updated",(e)=>{
 
-if(e.title){
-titulo.innerText = e.title.substring(0,25)
-}
+if(!e.title) return
+
+titulo.innerText = e.title.length > 25
+? e.title.substring(0,25) + "..."
+: e.title
 
 })
 
@@ -165,26 +168,32 @@ icon.src = e.favicons[0]
 })
 
 
-// atualizar barra de URL
+// atualizar barra
 
 webview.addEventListener("did-navigate", atualizarBarraSegura)
 webview.addEventListener("did-navigate-in-page", atualizarBarraSegura)
 webview.addEventListener("did-finish-load", atualizarBarraSegura)
 
 
-// detectar crash
+// crash da aba
 
 webview.addEventListener("crashed", ()=>{
+
 alert("A aba travou.")
+
 })
 
 
 // abrir links em nova aba
 
 webview.addEventListener("new-window",(e)=>{
-if(e.url){
+
+if(!e.url) return
+
+if(e.url.startsWith("http")){
 novaAba(e.url)
 }
+
 })
 
 
@@ -196,9 +205,11 @@ browserContainer.appendChild(webview)
 // salvar aba
 
 abas.push({
+
 id:id,
 botao:tabButton,
 webview:webview
+
 })
 
 
@@ -211,7 +222,7 @@ trocarAba(id)
 
 setTimeout(()=>{
 salvarSessao()
-},500)
+},300)
 
 }
 
@@ -246,7 +257,7 @@ const aba = abas.find(t=>t.id === id)
 
 if(!aba) return
 
-aba.webview.style.display="block"
+aba.webview.style.display="flex"
 aba.botao.classList.add("active-tab")
 
 window.abaAtual = aba
@@ -269,14 +280,16 @@ if(index === -1) return
 const aba = abas[index]
 
 try{
+
 aba.webview.remove()
 aba.botao.remove()
+
 }catch(e){}
 
 abas.splice(index,1)
 
 
-// se ainda existem abas
+// ainda existem abas
 
 if(abas.length){
 
@@ -291,6 +304,29 @@ novaAba("https://www.google.com")
 }
 
 salvarSessao()
+
+}
+
+
+// =======================================
+// DUPLICAR ABA
+// =======================================
+
+function duplicarAba(){
+
+if(!window.abaAtual) return
+
+try{
+
+const url = window.abaAtual.webview.getURL()
+
+novaAba(url)
+
+}catch(e){
+
+console.warn("Erro duplicar aba")
+
+}
 
 }
 
@@ -316,7 +352,7 @@ window.addEventListener("DOMContentLoaded",()=>{
 
 setTimeout(()=>{
 
-if(abas.length===0){
+if(abas.length === 0){
 restaurarSessao()
 }
 
