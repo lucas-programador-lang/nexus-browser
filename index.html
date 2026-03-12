@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="assets/logo.png">
 
-
 </head>
 
 <body>
@@ -94,10 +93,7 @@ autocomplete="off"
 <div class="menu-item" id="menuDownloads">Downloads</div>
 <div class="menu-item" id="menuFavoritos">Favoritos</div>
 <div class="menu-item" id="menuConfiguracoes">Configurações</div>
-
-<!-- NOVO BOTÃO -->
 <div class="menu-item" id="menuUpdate">Atualizar navegador</div>
-
 <div class="menu-item" id="menuAjuda">Ajuda</div>
 
 </div>
@@ -116,12 +112,28 @@ window.addEventListener("DOMContentLoaded", () => {
 const menu = document.getElementById("menuDropdown")
 const btnMenu = document.getElementById("btnMenu")
 const urlBar = document.getElementById("url")
+const btnNovaAba = document.getElementById("btnNovaAba")
 
 // primeira aba
+if(typeof novaAba === "function"){
 novaAba("https://www.google.com")
+}
 
-// abrir menu
-btnMenu.addEventListener("click",(e)=>{
+
+// ===============================
+// BOTÃO NOVA ABA
+// ===============================
+
+btnNovaAba?.addEventListener("click",()=>{
+novaAba("https://www.google.com")
+})
+
+
+// ===============================
+// MENU
+// ===============================
+
+btnMenu?.addEventListener("click",(e)=>{
 
 e.stopPropagation()
 
@@ -133,6 +145,7 @@ menu.style.display === "block"
 })
 
 // fechar menu
+
 document.addEventListener("click",(e)=>{
 
 if(!btnMenu.contains(e.target) && !menu.contains(e.target)){
@@ -174,12 +187,24 @@ urlBar.value = "nexus://settings"
 navegar()
 }
 
-// ATUALIZAÇÃO DO NAVEGADOR
+
+// ===============================
+// ATUALIZAR NAVEGADOR
+// ===============================
+
 document.getElementById("menuUpdate").onclick = ()=>{
-window.nexusAPI.send("check-update")
+
+if(window.nexus){
+window.nexus.checkUpdate?.()
 }
 
-// ajuda
+}
+
+
+// ===============================
+// AJUDA
+// ===============================
+
 document.getElementById("menuAjuda").onclick = ()=>{
 urlBar.value = "https://www.google.com/search?q=Nexus+Browser+ajuda"
 navegar()
