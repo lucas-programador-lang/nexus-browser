@@ -10,17 +10,28 @@ log.transports.file.level = "info"
 autoUpdater.logger = log
 
 // bloqueador de anúncios
-const enableAdBlock = require("./security/adblock")
+let enableAdBlock
+try{
+enableAdBlock = require("./security/adblock")
+}catch(e){
+console.log("Adblock não encontrado")
+}
 
 let mainWindow
 
-// caminhos de dados
+
+// =======================================
+// CAMINHOS DE DADOS
+// =======================================
+
 const dataPath = app.getPath("userData")
+
 const historyFile = path.join(dataPath,"history.json")
 const favFile = path.join(dataPath,"favorites.json")
 
 let historico = []
 let favoritos = []
+
 
 // =======================================
 // CARREGAR DADOS
@@ -30,20 +41,18 @@ function carregarDados(){
 
 try{
 if(fs.existsSync(historyFile)){
-const data = fs.readFileSync(historyFile)
-historico = JSON.parse(data || "[]")
+historico = JSON.parse(fs.readFileSync(historyFile))
 }
 }catch(e){
-historico=[]
+historico = []
 }
 
 try{
 if(fs.existsSync(favFile)){
-const data = fs.readFileSync(favFile)
-favoritos = JSON.parse(data || "[]")
+favoritos = JSON.parse(fs.readFileSync(favFile))
 }
 }catch(e){
-favoritos=[]
+favoritos = []
 }
 
 }
@@ -89,33 +98,30 @@ minHeight:600,
 
 backgroundColor:"#0f172a",
 
-icon: path.join(__dirname,"assets/logo.png"),
+// ÍCONE PROFISSIONAL
+icon: path.join(__dirname,"assets/icon.ico"),
 
 webPreferences:{
 preload: path.join(__dirname,"preload.js"),
 nodeIntegration:false,
 contextIsolation:true,
-webviewTag:true,
-sandbox:true
+webviewTag:true
 }
 
 })
 
 mainWindow.loadFile("index.html")
 
-// abrir links externos
+mainWindow.setMenu(null)
+
+
+// abrir links externos fora do navegador
+
 mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 
 shell.openExternal(url)
+
 return { action:"deny" }
-
-})
-
-mainWindow.setMenu(null)
-
-mainWindow.webContents.on("did-finish-load",()=>{
-
-mainWindow.webContents.setZoomFactor(1)
 
 })
 
@@ -135,7 +141,9 @@ const url = item.getURL()
 
 console.log("Download iniciado:",fileName)
 
+
 // bloquear scripts perigosos
+
 if(url.endsWith(".bat") || url.endsWith(".cmd") || url.endsWith(".ps1")){
 
 event.preventDefault()
@@ -149,12 +157,16 @@ return
 
 }
 
+
+// progresso
+
 item.on("updated",(event,state)=>{
 
 if(state === "progressing"){
 
-const percent =
-Math.round((item.getReceivedBytes()/item.getTotalBytes())*100)
+const percent = Math.round(
+(item.getReceivedBytes()/item.getTotalBytes())*100
+)
 
 if(mainWindow){
 mainWindow.webContents.send("download-progress",percent)
@@ -163,6 +175,9 @@ mainWindow.webContents.send("download-progress",percent)
 }
 
 })
+
+
+// finalizado
 
 item.once("done",(event,state)=>{
 
@@ -222,7 +237,10 @@ return favoritos
 ipcMain.handle("add-favorite",(event,data)=>{
 
 favoritos.push(data)
+
 salvarFavoritos()
+
+return true
 
 })
 
@@ -237,14 +255,17 @@ return historico
 
 function iniciarAtualizacao(){
 
-// não roda update em modo dev
+// atualização apenas no app instalado
+
 if(!app.isPackaged) return
 
 autoUpdater.checkForUpdatesAndNotify()
 
+
 autoUpdater.on("checking-for-update",()=>{
 console.log("Verificando atualização...")
 })
+
 
 autoUpdater.on("update-available",()=>{
 
@@ -256,6 +277,7 @@ message:"Nova versão do Nexus Browser encontrada. Baixando atualização..."
 
 })
 
+
 autoUpdater.on("update-downloaded",()=>{
 
 dialog.showMessageBox({
@@ -263,7 +285,9 @@ type:"info",
 title:"Atualização pronta",
 message:"Atualização baixada. O navegador será reiniciado."
 }).then(()=>{
+
 autoUpdater.quitAndInstall()
+
 })
 
 })
@@ -276,12 +300,16 @@ autoUpdater.quitAndInstall()
 ipcMain.on("check-update",()=>{
 
 if(app.isPackaged){
+
 autoUpdater.checkForUpdates()
+
 }else{
+
 dialog.showMessageBox({
 type:"info",
 message:"Atualizações funcionam apenas no aplicativo instalado."
 })
+
 }
 
 })
@@ -295,8 +323,9 @@ app.whenReady().then(()=>{
 
 carregarDados()
 
+// iniciar adblock
 try{
-enableAdBlock()
+if(enableAdBlock) enableAdBlock()
 }catch(e){
 console.log("Adblock não iniciado")
 }
@@ -324,7 +353,7 @@ createWindow()
 
 app.on("window-all-closed",()=>{
 
-if(process.platform!=="darwin"){
+if(process.platform !== "darwin"){
 app.quit()
 }
 
