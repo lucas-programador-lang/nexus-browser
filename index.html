@@ -16,10 +16,15 @@
 <!-- LOGO -->
 <img src="assets/logo.png" id="logo">
 
+
+<!-- =============================== -->
 <!-- BARRA SUPERIOR -->
+<!-- =============================== -->
+
 <div class="topbar">
 
 <!-- CONTROLES -->
+
 <div class="nav-controls">
 
 <button id="btnVoltar" title="Voltar">
@@ -36,7 +41,9 @@
 
 </div>
 
+
 <!-- BARRA URL -->
+
 <input
 id="url"
 type="text"
@@ -44,7 +51,9 @@ placeholder="Pesquisar ou digitar URL"
 autocomplete="off"
 />
 
+
 <!-- BOTÕES -->
+
 <div class="nav-buttons">
 
 <button id="btnIr" title="Ir">
@@ -65,7 +74,9 @@ autocomplete="off"
 
 </div>
 
+
 <!-- MENU -->
+
 <div class="menu-area">
 
 <button id="btnMenu" title="Menu">
@@ -77,14 +88,27 @@ autocomplete="off"
 </div>
 
 
+
+<!-- =============================== -->
 <!-- ABAS -->
+<!-- =============================== -->
+
 <div id="tabs"></div>
 
+
+
+<!-- =============================== -->
 <!-- NAVEGADOR -->
+<!-- =============================== -->
+
 <div id="browser-container"></div>
 
 
+
+<!-- =============================== -->
 <!-- MENU DROPDOWN -->
+<!-- =============================== -->
+
 <div id="menuDropdown" class="menu-dropdown">
 
 <div class="menu-item" id="menuNovaGuia">Nova guia</div>
@@ -99,11 +123,16 @@ autocomplete="off"
 </div>
 
 
+
+<!-- =============================== -->
 <!-- SCRIPTS -->
+<!-- =============================== -->
+
 <script src="tabs.js"></script>
 <script src="renderer.js"></script>
 <script src="ai.js"></script>
 <script src="security.js"></script>
+
 
 <script>
 
@@ -114,19 +143,19 @@ const btnMenu = document.getElementById("btnMenu")
 const urlBar = document.getElementById("url")
 const btnNovaAba = document.getElementById("btnNovaAba")
 
-// primeira aba
+
+// ===============================
+// NOVA ABA
+// ===============================
+
+btnNovaAba?.addEventListener("click",()=>{
+
 if(typeof novaAba === "function"){
 novaAba("https://www.google.com")
 }
 
-
-// ===============================
-// BOTÃO NOVA ABA
-// ===============================
-
-btnNovaAba?.addEventListener("click",()=>{
-novaAba("https://www.google.com")
 })
+
 
 
 // ===============================
@@ -144,15 +173,20 @@ menu.style.display === "block"
 
 })
 
-// fechar menu
+
+
+// ===============================
+// FECHAR MENU
+// ===============================
 
 document.addEventListener("click",(e)=>{
 
-if(!btnMenu.contains(e.target) && !menu.contains(e.target)){
+if(!btnMenu?.contains(e.target) && !menu?.contains(e.target)){
 menu.style.display="none"
 }
 
 })
+
 
 
 // ===============================
@@ -188,17 +222,19 @@ navegar()
 }
 
 
+
 // ===============================
 // ATUALIZAR NAVEGADOR
 // ===============================
 
 document.getElementById("menuUpdate").onclick = ()=>{
 
-if(window.nexus){
-window.nexus.checkUpdate?.()
+if(window.nexusAPI){
+window.nexusAPI.send("check-update")
 }
 
 }
+
 
 
 // ===============================
@@ -206,8 +242,12 @@ window.nexus.checkUpdate?.()
 // ===============================
 
 document.getElementById("menuAjuda").onclick = ()=>{
-urlBar.value = "https://www.google.com/search?q=Nexus+Browser+ajuda"
+
+urlBar.value =
+"https://www.google.com/search?q=Nexus+Browser+ajuda"
+
 navegar()
+
 }
 
 })
