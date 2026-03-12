@@ -7,6 +7,8 @@ let btnVoltar = null
 let btnAvancar = null
 let btnRecarregar = null
 let btnIr = null
+let btnIA = null
+let btnEstudo = null
 
 
 // =======================================
@@ -20,8 +22,11 @@ btnVoltar = document.getElementById("btnVoltar")
 btnAvancar = document.getElementById("btnAvancar")
 btnRecarregar = document.getElementById("btnRecarregar")
 btnIr = document.getElementById("btnIr")
+btnIA = document.getElementById("btnIA")
+btnEstudo = document.getElementById("btnEstudo")
 
-// ENTER na barra
+
+// ENTER NA BARRA
 if(urlBar){
 urlBar.addEventListener("keydown",(e)=>{
 if(e.key === "Enter"){
@@ -30,13 +35,38 @@ navegar()
 })
 }
 
-// BOTÕES
-if(btnVoltar) btnVoltar.addEventListener("click", voltar)
-if(btnAvancar) btnAvancar.addEventListener("click", avancar)
-if(btnRecarregar) btnRecarregar.addEventListener("click", recarregar)
-if(btnIr) btnIr.addEventListener("click", navegar)
+
+// BOTÕES NAVEGAÇÃO
+
+if(btnVoltar) btnVoltar.onclick = voltar
+if(btnAvancar) btnAvancar.onclick = avancar
+if(btnRecarregar) btnRecarregar.onclick = recarregar
+if(btnIr) btnIr.onclick = navegar
+
+
+// IA
+
+if(btnIA){
+btnIA.onclick = ()=>{
+if(typeof abrirIA === "function"){
+abrirIA()
+}
+}
+}
+
+
+// MODO ESTUDO
+
+if(btnEstudo){
+btnEstudo.onclick = ()=>{
+if(typeof modoEstudo === "function"){
+modoEstudo()
+}
+}
+}
 
 })
+
 
 
 // =======================================
@@ -52,9 +82,7 @@ let urlInput = urlBar.value.trim()
 if(!urlInput) return
 
 
-// =======================================
 // PÁGINAS INTERNAS
-// =======================================
 
 if(urlInput.startsWith("nexus://")){
 abrirPaginaInterna(urlInput)
@@ -62,9 +90,7 @@ return
 }
 
 
-// =======================================
-// PESQUISA INTELIGENTE
-// =======================================
+// PESQUISA GOOGLE
 
 if(!urlInput.includes(".")){
 
@@ -75,27 +101,21 @@ encodeURIComponent(urlInput)
 }
 
 
-// =======================================
 // HTTPS AUTOMÁTICO
-// =======================================
 
 if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
 urlInput = "https://" + urlInput
 }
 
 
-// =======================================
 // SEGURANÇA
-// =======================================
 
 if(typeof verificarSite === "function"){
 verificarSite(urlInput)
 }
 
 
-// =======================================
-// VERIFICAR ABA ATIVA
-// =======================================
+// VERIFICAR ABA
 
 if(!window.abaAtual || !window.abaAtual.webview){
 console.warn("Nenhuma aba ativa")
@@ -103,38 +123,29 @@ return
 }
 
 
-// =======================================
-// EVITAR RELOAD DA MESMA URL
-// =======================================
+// EVITAR RELOAD
 
 try{
-
 if(window.abaAtual.webview.getURL() === urlInput){
 return
 }
-
 }catch(e){}
 
 
-// =======================================
 // NAVEGAR
-// =======================================
 
 try{
-
 window.abaAtual.webview.loadURL(urlInput)
-
 }catch(err){
-
 console.error("Erro navegar:",err)
-
 }
 
 }
+
 
 
 // =======================================
-// PÁGINAS INTERNAS DO NAVEGADOR
+// PÁGINAS INTERNAS
 // =======================================
 
 function abrirPaginaInterna(url){
@@ -169,6 +180,7 @@ titulo = "Nexus Browser"
 conteudo = "Página não encontrada."
 }
 
+
 const pagina = `
 <!DOCTYPE html>
 <html>
@@ -179,7 +191,7 @@ const pagina = `
 <style>
 
 body{
-font-family:Segoe UI, Arial;
+font-family:Segoe UI;
 background:#0f172a;
 color:white;
 margin:0;
@@ -191,21 +203,11 @@ max-width:900px;
 margin:auto;
 }
 
-h1{
-font-size:32px;
-margin-bottom:10px;
-}
-
 .card{
 background:#1e293b;
 padding:20px;
 border-radius:10px;
 margin-top:20px;
-}
-
-p{
-color:#94a3b8;
-font-size:16px;
 }
 
 </style>
@@ -235,6 +237,7 @@ window.abaAtual.webview.loadURL(
 }
 
 
+
 // =======================================
 // ATUALIZAR BARRA
 // =======================================
@@ -249,21 +252,18 @@ if(urlBar){
 
 const url = window.abaAtual.webview.getURL()
 
-if(url.startsWith("data:text/html")){
-return
-}
+if(url.startsWith("data:text/html")) return
 
 urlBar.value = url
 
 }
 
 }catch(e){
-
 console.warn("Erro atualizar barra")
-
 }
 
 }
+
 
 
 // =======================================
@@ -281,12 +281,11 @@ window.abaAtual.webview.goBack()
 }
 
 }catch(e){
-
 console.warn("Erro voltar")
-
 }
 
 }
+
 
 
 // =======================================
@@ -304,12 +303,11 @@ window.abaAtual.webview.goForward()
 }
 
 }catch(e){
-
 console.warn("Erro avançar")
-
 }
 
 }
+
 
 
 // =======================================
@@ -321,101 +319,9 @@ function recarregar(){
 if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
-
 window.abaAtual.webview.reload()
-
 }catch(e){
-
 console.warn("Erro reload")
-
 }
 
 }
-
-
-// =======================================
-// ATALHOS
-// =======================================
-
-document.addEventListener("keydown",(e)=>{
-
-
-// CTRL + L
-if(e.ctrlKey && e.key === "l"){
-e.preventDefault()
-if(urlBar){
-urlBar.focus()
-urlBar.select()
-}
-}
-
-
-// CTRL + T
-if(e.ctrlKey && e.key === "t"){
-e.preventDefault()
-if(typeof novaAba === "function"){
-novaAba("https://www.google.com")
-}
-}
-
-
-// CTRL + W
-if(e.ctrlKey && e.key === "w"){
-e.preventDefault()
-if(window.abaAtual && typeof fecharAba === "function"){
-fecharAba(window.abaAtual.id)
-}
-}
-
-
-// CTRL + R
-if(e.ctrlKey && e.key === "r"){
-e.preventDefault()
-recarregar()
-}
-
-
-// CTRL + H
-if(e.ctrlKey && e.key === "h"){
-e.preventDefault()
-urlBar.value = "nexus://history"
-navegar()
-}
-
-
-// CTRL + D
-if(e.ctrlKey && e.key === "d"){
-e.preventDefault()
-urlBar.value = "nexus://favorites"
-navegar()
-}
-
-
-// CTRL + J
-if(e.ctrlKey && e.key === "j"){
-e.preventDefault()
-urlBar.value = "nexus://downloads"
-navegar()
-}
-
-
-// CTRL + ,
-if(e.ctrlKey && e.key === ","){
-e.preventDefault()
-urlBar.value = "nexus://settings"
-navegar()
-}
-
-
-// ALT ←
-if(e.altKey && e.key === "ArrowLeft"){
-voltar()
-}
-
-
-// ALT →
-if(e.altKey && e.key === "ArrowRight"){
-avancar()
-}
-
-})
