@@ -31,10 +31,10 @@ navegar()
 }
 
 // BOTÕES
-btnVoltar && btnVoltar.addEventListener("click", voltar)
-btnAvancar && btnAvancar.addEventListener("click", avancar)
-btnRecarregar && btnRecarregar.addEventListener("click", recarregar)
-btnIr && btnIr.addEventListener("click", navegar)
+if(btnVoltar) btnVoltar.addEventListener("click", voltar)
+if(btnAvancar) btnAvancar.addEventListener("click", avancar)
+if(btnRecarregar) btnRecarregar.addEventListener("click", recarregar)
+if(btnIr) btnIr.addEventListener("click", navegar)
 
 })
 
@@ -67,25 +67,35 @@ return
 // =======================================
 
 if(!urlInput.includes(".")){
-urlInput = "https://www.google.com/search?q=" + encodeURIComponent(urlInput)
+
+urlInput =
+"https://www.google.com/search?q=" +
+encodeURIComponent(urlInput)
+
 }
 
 
+// =======================================
 // HTTPS AUTOMÁTICO
+// =======================================
 
 if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
 urlInput = "https://" + urlInput
 }
 
 
+// =======================================
 // SEGURANÇA
+// =======================================
 
 if(typeof verificarSite === "function"){
 verificarSite(urlInput)
 }
 
 
-// VERIFICAR ABA
+// =======================================
+// VERIFICAR ABA ATIVA
+// =======================================
 
 if(!window.abaAtual || !window.abaAtual.webview){
 console.warn("Nenhuma aba ativa")
@@ -93,21 +103,31 @@ return
 }
 
 
-// EVITAR RELOAD
+// =======================================
+// EVITAR RELOAD DA MESMA URL
+// =======================================
 
 try{
+
 if(window.abaAtual.webview.getURL() === urlInput){
 return
 }
+
 }catch(e){}
 
 
+// =======================================
 // NAVEGAR
+// =======================================
 
 try{
+
 window.abaAtual.webview.loadURL(urlInput)
+
 }catch(err){
+
 console.error("Erro navegar:",err)
+
 }
 
 }
@@ -126,7 +146,7 @@ let conteudo = ""
 
 if(url === "nexus://history"){
 titulo = "Histórico"
-conteudo = "Histórico do navegador."
+conteudo = "Aqui aparecerá o histórico do navegador."
 }
 
 else if(url === "nexus://downloads"){
@@ -224,11 +244,23 @@ function atualizarBarra(){
 if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
+
 if(urlBar){
-urlBar.value = window.abaAtual.webview.getURL()
+
+const url = window.abaAtual.webview.getURL()
+
+if(url.startsWith("data:text/html")){
+return
 }
+
+urlBar.value = url
+
+}
+
 }catch(e){
+
 console.warn("Erro atualizar barra")
+
 }
 
 }
@@ -243,11 +275,15 @@ function voltar(){
 if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
+
 if(window.abaAtual.webview.canGoBack()){
 window.abaAtual.webview.goBack()
 }
+
 }catch(e){
+
 console.warn("Erro voltar")
+
 }
 
 }
@@ -262,11 +298,15 @@ function avancar(){
 if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
+
 if(window.abaAtual.webview.canGoForward()){
 window.abaAtual.webview.goForward()
 }
+
 }catch(e){
+
 console.warn("Erro avançar")
+
 }
 
 }
@@ -281,9 +321,13 @@ function recarregar(){
 if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
+
 window.abaAtual.webview.reload()
+
 }catch(e){
+
 console.warn("Erro reload")
+
 }
 
 }
@@ -299,8 +343,10 @@ document.addEventListener("keydown",(e)=>{
 // CTRL + L
 if(e.ctrlKey && e.key === "l"){
 e.preventDefault()
-urlBar && urlBar.focus()
-urlBar && urlBar.select()
+if(urlBar){
+urlBar.focus()
+urlBar.select()
+}
 }
 
 
