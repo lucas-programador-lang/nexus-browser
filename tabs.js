@@ -113,10 +113,8 @@ fechar.innerText = "✕"
 fechar.className = "close-tab"
 
 fechar.onclick = (e)=>{
-
 e.stopPropagation()
 fecharAba(id)
-
 }
 
 
@@ -141,6 +139,8 @@ webview.src = url
 webview.className = "browser-view"
 webview.id = "view-" + id
 webview.style.display="none"
+webview.style.width="100%"
+webview.style.height="100%"
 
 
 // título da página
@@ -167,23 +167,9 @@ icon.src = e.favicons[0]
 
 // atualizar barra de URL
 
-webview.addEventListener("did-navigate", ()=>{
-if(typeof atualizarBarra === "function"){
-atualizarBarra()
-}
-})
-
-webview.addEventListener("did-navigate-in-page", ()=>{
-if(typeof atualizarBarra === "function"){
-atualizarBarra()
-}
-})
-
-webview.addEventListener("did-finish-load", ()=>{
-if(typeof atualizarBarra === "function"){
-atualizarBarra()
-}
-})
+webview.addEventListener("did-navigate", atualizarBarraSegura)
+webview.addEventListener("did-navigate-in-page", atualizarBarraSegura)
+webview.addEventListener("did-finish-load", atualizarBarraSegura)
 
 
 // detectar crash
@@ -231,6 +217,19 @@ salvarSessao()
 
 
 // =======================================
+// ATUALIZAR BARRA SEGURO
+// =======================================
+
+function atualizarBarraSegura(){
+
+if(typeof atualizarBarra === "function"){
+atualizarBarra()
+}
+
+}
+
+
+// =======================================
 // TROCAR ABA
 // =======================================
 
@@ -247,14 +246,12 @@ const aba = abas.find(t=>t.id === id)
 
 if(!aba) return
 
-aba.webview.style.display="flex"
+aba.webview.style.display="block"
 aba.botao.classList.add("active-tab")
 
 window.abaAtual = aba
 
-if(typeof atualizarBarra === "function"){
-atualizarBarra()
-}
+atualizarBarraSegura()
 
 }
 
