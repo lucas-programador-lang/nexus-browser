@@ -29,6 +29,7 @@ painel.innerHTML = `
 padding:12px;
 border-bottom:1px solid #334155;
 font-weight:bold;
+font-size:16px;
 ">
 
 Nexus AI
@@ -43,8 +44,8 @@ font-size:14px;
 line-height:1.6;
 ">
 
-Olá 👋  
-Posso ajudar a explicar páginas, resumir conteúdo ou responder perguntas.
+<p>Olá 👋</p>
+<p>Posso ajudar a explicar páginas, resumir conteúdo ou responder perguntas.</p>
 
 </div>
 
@@ -71,9 +72,9 @@ outline:none;
 
 <button id="iaEnviar">Enviar</button>
 
-<button onclick="resumirPagina()">Resumo</button>
+<button id="iaResumo">Resumo</button>
 
-<button onclick="fecharIA()">✕</button>
+<button id="iaFechar">✕</button>
 
 </div>
 
@@ -82,6 +83,18 @@ outline:none;
 document.body.appendChild(painel)
 
 document.getElementById("iaEnviar").onclick = perguntarIA
+document.getElementById("iaResumo").onclick = resumirPagina
+document.getElementById("iaFechar").onclick = fecharIA
+
+// ENTER envia pergunta
+
+document.getElementById("iaInput").addEventListener("keydown",(e)=>{
+
+if(e.key === "Enter"){
+perguntarIA()
+}
+
+})
 
 }
 
@@ -102,37 +115,57 @@ painel.remove()
 
 
 // =======================================
+// ADICIONAR MENSAGEM AO CHAT
+// =======================================
+
+function adicionarMensagem(html){
+
+const chat = document.getElementById("iaChat")
+
+if(!chat) return
+
+chat.innerHTML += html
+
+chat.scrollTop = chat.scrollHeight
+
+}
+
+
+// =======================================
 // PERGUNTAR PARA IA
 // =======================================
 
 async function perguntarIA(){
 
 const input = document.getElementById("iaInput")
-const chat = document.getElementById("iaChat")
 
-if(!input.value.trim()) return
+if(!input) return
 
-const pergunta = input.value
+const pergunta = input.value.trim()
 
-chat.innerHTML += `<p><b>Você:</b> ${pergunta}</p>`
+if(!pergunta) return
+
+adicionarMensagem(`<p><b>Você:</b> ${pergunta}</p>`)
 
 input.value = ""
 
-chat.innerHTML += `<p><i>IA pensando...</i></p>`
+adicionarMensagem(`<p><i>IA pensando...</i></p>`)
 
 try{
 
+if(!window.nexus){
+throw new Error("IA indisponível")
+}
+
 const resposta = await window.nexus.askAI(pergunta)
 
-chat.innerHTML += `<p><b>IA:</b> ${resposta}</p>`
+adicionarMensagem(`<p><b>IA:</b> ${resposta}</p>`)
 
 }catch(e){
 
-chat.innerHTML += `<p><b>Erro ao consultar IA</b></p>`
+adicionarMensagem(`<p><b>Erro ao consultar IA</b></p>`)
 
 }
-
-chat.scrollTop = chat.scrollHeight
 
 }
 
@@ -143,7 +176,7 @@ chat.scrollTop = chat.scrollHeight
 
 function resumirPagina(){
 
-if(!abaAtual || !abaAtual.webview){
+if(!window.abaAtual || !window.abaAtual.webview){
 
 alert("Nenhuma página aberta")
 
@@ -151,17 +184,12 @@ return
 
 }
 
-abaAtual.webview.executeJavaScript(`
-
-document.body.innerText
-
-`).then(async texto=>{
+window.abaAtual.webview.executeJavaScript(`document.body.innerText`)
+.then(async texto=>{
 
 const conteudo = texto.substring(0,4000)
 
-const chat = document.getElementById("iaChat")
-
-chat.innerHTML += `<p><i>Resumindo página...</i></p>`
+adicionarMensagem(`<p><i>Resumindo página...</i></p>`)
 
 try{
 
@@ -169,11 +197,11 @@ const resumo = await window.nexus.askAI(
 "Resuma este texto:\n\n" + conteudo
 )
 
-chat.innerHTML += `<p><b>Resumo:</b> ${resumo}</p>`
+adicionarMensagem(`<p><b>Resumo:</b> ${resumo}</p>`)
 
 }catch(e){
 
-chat.innerHTML += `<p>Erro ao gerar resumo</p>`
+adicionarMensagem(`<p>Erro ao gerar resumo</p>`)
 
 }
 
@@ -188,7 +216,7 @@ chat.innerHTML += `<p>Erro ao gerar resumo</p>`
 
 function modoEstudo(){
 
-if(!abaAtual || !abaAtual.webview){
+if(!window.abaAtual || !window.abaAtual.webview){
 
 alert("Nenhuma página aberta.")
 
@@ -196,7 +224,7 @@ return
 
 }
 
-abaAtual.webview.executeJavaScript(`
+window.abaAtual.webview.executeJavaScript(`
 
 document.body.style.background="#111";
 document.body.style.color="#eee";
