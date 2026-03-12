@@ -2,6 +2,13 @@ const { app, BrowserWindow, shell, session, dialog, ipcMain } = require("electro
 const path = require("path")
 const fs = require("fs")
 
+// UPDATE
+const { autoUpdater } = require("electron-updater")
+const log = require("electron-log")
+
+log.transports.file.level = "info"
+autoUpdater.logger = log
+
 // bloqueador de anúncios
 const enableAdBlock = require("./security/adblock")
 
@@ -15,7 +22,10 @@ const favFile = path.join(dataPath,"favorites.json")
 let historico = []
 let favoritos = []
 
-// carregar arquivos salvos
+// =======================================
+// CARREGAR DADOS
+// =======================================
+
 function carregarDados(){
 
 try{
@@ -75,7 +85,7 @@ webviewTag:true
 
 mainWindow.loadFile("index.html")
 
-// links externos
+// abrir links externos no navegador
 mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 
 shell.openExternal(url)
@@ -198,6 +208,52 @@ return historico
 
 
 // =======================================
+// SISTEMA DE ATUALIZAÇÃO
+// =======================================
+
+function iniciarAtualizacao(){
+
+autoUpdater.checkForUpdatesAndNotify()
+
+autoUpdater.on("checking-for-update",()=>{
+console.log("Verificando atualização...")
+})
+
+autoUpdater.on("update-available",()=>{
+
+dialog.showMessageBox({
+type:"info",
+title:"Atualização disponível",
+message:"Nova versão do Nexus Browser encontrada. Baixando atualização..."
+})
+
+})
+
+autoUpdater.on("update-downloaded",()=>{
+
+dialog.showMessageBox({
+type:"info",
+title:"Atualização pronta",
+message:"Atualização baixada. O navegador será reiniciado."
+}).then(()=>{
+
+autoUpdater.quitAndInstall()
+
+})
+
+})
+
+}
+
+
+// botão verificar atualização
+
+ipcMain.on("check-update",()=>{
+autoUpdater.checkForUpdates()
+})
+
+
+// =======================================
 // INICIAR APP
 // =======================================
 
@@ -213,6 +269,7 @@ console.log("Adblock não iniciado")
 
 iniciarDownloads()
 iniciarHistorico()
+iniciarAtualizacao()
 
 createWindow()
 
