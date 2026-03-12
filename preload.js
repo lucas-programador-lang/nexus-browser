@@ -1,8 +1,8 @@
 const { contextBridge, ipcRenderer } = require("electron")
 
-// ===============================
+// =======================================
 // INICIAR NAVEGADOR
-// ===============================
+// =======================================
 
 window.addEventListener("DOMContentLoaded", () => {
 
@@ -11,21 +11,63 @@ console.log("🚀 Nexus Browser iniciado")
 })
 
 
+// =======================================
+// API SEGURA DO NAVEGADOR
+// =======================================
+
+contextBridge.exposeInMainWorld("nexus", {
+
+
 // ===============================
-// API SEGURA PARA FRONTEND
+// HISTÓRICO
 // ===============================
 
-contextBridge.exposeInMainWorld("nexusAPI", {
+getHistory: () => ipcRenderer.invoke("get-history"),
 
 
-// enviar mensagem para o processo principal
-send: (channel, data) => {
-ipcRenderer.send(channel, data)
+// ===============================
+// FAVORITOS
+// ===============================
+
+getFavorites: () => ipcRenderer.invoke("get-favorites"),
+
+addFavorite: (data) => ipcRenderer.invoke("add-favorite", data),
+
+
+// ===============================
+// DOWNLOADS
+// ===============================
+
+onDownloadProgress: (callback) => {
+
+ipcRenderer.on("download-progress", (event, percent) => {
+callback(percent)
+})
+
 },
 
-// receber mensagem
-receive: (channel, func) => {
-ipcRenderer.on(channel, (event, ...args) => func(...args))
-}
+onDownloadComplete: (callback) => {
+
+ipcRenderer.on("download-complete", (event, file) => {
+callback(file)
+})
+
+},
+
+
+// ===============================
+// CONFIGURAÇÕES
+// ===============================
+
+getSettings: () => ipcRenderer.invoke("get-settings"),
+
+saveSettings: (data) => ipcRenderer.invoke("save-settings", data),
+
+
+// ===============================
+// IA DO NAVEGADOR
+// ===============================
+
+askAI: (prompt) => ipcRenderer.invoke("ask-ai", prompt)
 
 })
