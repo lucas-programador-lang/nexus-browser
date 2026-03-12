@@ -1,17 +1,31 @@
-// ===============================
-// VERIFICAR SITE SUSPEITO
-// ===============================
+// =======================================
+// SEGURANÇA DO NAVEGADOR
+// =======================================
+
+// evita alertas repetidos
+let ultimoAviso = ""
+
+
+// =======================================
+// VERIFICAR SITE
+// =======================================
 
 function verificarSite(url){
 
 if(!url) return
 
+try{
+
 url = url.toLowerCase()
 
+}catch(e){
+return
+}
 
-// ===============================
+
+// =======================================
 // PALAVRAS SUSPEITAS
-// ===============================
+// =======================================
 
 const palavrasSuspeitas = [
 
@@ -25,14 +39,17 @@ const palavrasSuspeitas = [
 "claim-reward",
 "bitcoin-free",
 "easy-profit",
-"instant-money"
+"instant-money",
+"get-rich",
+"airdrop",
+"free-crypto"
 
 ]
 
 
-// ===============================
+// =======================================
 // ENCURTADORES DE LINK
-// ===============================
+// =======================================
 
 const encurtadores = [
 
@@ -40,62 +57,76 @@ const encurtadores = [
 "tinyurl.com",
 "cutt.ly",
 "t.co",
+"is.gd",
 "shorturl",
-"goo.gl",
-"is.gd"
+"rebrand.ly",
+"tiny.cc"
 
 ]
 
 
-// ===============================
-// DOMÍNIOS PERIGOSOS
-// ===============================
+// =======================================
+// DOMÍNIOS SUSPEITOS
+// =======================================
 
 const dominiosPerigosos = [
 
-"phishing",
 "login-secure",
+"verify-account",
 "account-verify",
 "update-wallet",
-"crypto-airdrop"
+"secure-wallet",
+"crypto-airdrop",
+"metamask-login",
+"wallet-update"
 
 ]
 
 
-// ===============================
+// =======================================
 // DETECÇÃO
-// ===============================
+// =======================================
 
-const palavraPerigosa = palavrasSuspeitas.some(p => url.includes(p))
+const palavraPerigosa =
+palavrasSuspeitas.some(p => url.includes(p))
 
-const linkEncurtado = encurtadores.some(p => url.includes(p))
+const linkEncurtado =
+encurtadores.some(p => url.includes(p))
 
-const dominioFalso = dominiosPerigosos.some(p => url.includes(p))
+const dominioFalso =
+dominiosPerigosos.some(p => url.includes(p))
 
-const httpInseguro = url.startsWith("http://")
+const httpInseguro =
+url.startsWith("http://")
 
 
-// ===============================
+// =======================================
 // ALERTAS
-// ===============================
+// =======================================
 
 if(palavraPerigosa){
 
-alert("⚠️ Atenção: Este site contém termos frequentemente usados em golpes.")
+mostrarAlertaSeguranca(
+"⚠️ Este site contém termos frequentemente usados em golpes."
+)
 
 }
 
 
 if(linkEncurtado){
 
-alert("⚠️ Este link é encurtado. Verifique antes de acessar.")
+mostrarAlertaSeguranca(
+"⚠️ Este link usa encurtador. Verifique o destino antes de acessar."
+)
 
 }
 
 
 if(dominioFalso){
 
-alert("⚠️ Possível página falsa detectada.")
+mostrarAlertaSeguranca(
+"🚨 Possível página de phishing detectada."
+)
 
 }
 
@@ -105,5 +136,52 @@ if(httpInseguro){
 console.warn("Site sem HTTPS:", url)
 
 }
+
+}
+
+
+// =======================================
+// ALERTA VISUAL
+// =======================================
+
+function mostrarAlertaSeguranca(msg){
+
+// evita repetição
+
+if(ultimoAviso === msg) return
+
+ultimoAviso = msg
+
+
+let alerta = document.getElementById("alertaSeguranca")
+
+if(alerta) alerta.remove()
+
+
+alerta = document.createElement("div")
+
+alerta.id = "alertaSeguranca"
+
+alerta.style.position = "fixed"
+alerta.style.bottom = "20px"
+alerta.style.left = "20px"
+alerta.style.background = "#7f1d1d"
+alerta.style.color = "white"
+alerta.style.padding = "12px 16px"
+alerta.style.borderRadius = "8px"
+alerta.style.fontSize = "14px"
+alerta.style.zIndex = "99999"
+alerta.style.boxShadow = "0 6px 20px rgba(0,0,0,0.4)"
+
+alerta.innerText = msg
+
+document.body.appendChild(alerta)
+
+
+// remover automaticamente
+
+setTimeout(()=>{
+alerta.remove()
+},5000)
 
 }
