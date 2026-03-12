@@ -2,11 +2,11 @@
 // CACHE DOM
 // =======================================
 
-let urlBar
-let btnVoltar
-let btnAvancar
-let btnRecarregar
-let btnIr
+let urlBar = null
+let btnVoltar = null
+let btnAvancar = null
+let btnRecarregar = null
+let btnIr = null
 
 
 // =======================================
@@ -31,10 +31,10 @@ navegar()
 }
 
 // BOTÕES
-btnVoltar?.addEventListener("click", voltar)
-btnAvancar?.addEventListener("click", avancar)
-btnRecarregar?.addEventListener("click", recarregar)
-btnIr?.addEventListener("click", navegar)
+btnVoltar && btnVoltar.addEventListener("click", voltar)
+btnAvancar && btnAvancar.addEventListener("click", avancar)
+btnRecarregar && btnRecarregar.addEventListener("click", recarregar)
+btnIr && btnIr.addEventListener("click", navegar)
 
 })
 
@@ -57,11 +57,8 @@ if(!urlInput) return
 // =======================================
 
 if(urlInput.startsWith("nexus://")){
-
 abrirPaginaInterna(urlInput)
-
 return
-
 }
 
 
@@ -70,23 +67,14 @@ return
 // =======================================
 
 if(!urlInput.includes(".")){
-
-urlInput =
-"https://www.google.com/search?q=" +
-encodeURIComponent(urlInput)
-
+urlInput = "https://www.google.com/search?q=" + encodeURIComponent(urlInput)
 }
 
 
 // HTTPS AUTOMÁTICO
 
-if(
-!urlInput.startsWith("http://") &&
-!urlInput.startsWith("https://")
-){
-
+if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
 urlInput = "https://" + urlInput
-
 }
 
 
@@ -99,7 +87,7 @@ verificarSite(urlInput)
 
 // VERIFICAR ABA
 
-if(!abaAtual || !abaAtual.webview){
+if(!window.abaAtual || !window.abaAtual.webview){
 console.warn("Nenhuma aba ativa")
 return
 }
@@ -108,24 +96,18 @@ return
 // EVITAR RELOAD
 
 try{
-
-if(abaAtual.webview.getURL() === urlInput){
+if(window.abaAtual.webview.getURL() === urlInput){
 return
 }
-
 }catch(e){}
 
 
 // NAVEGAR
 
 try{
-
-abaAtual.webview.loadURL(urlInput)
-
+window.abaAtual.webview.loadURL(urlInput)
 }catch(err){
-
 console.error("Erro navegar:",err)
-
 }
 
 }
@@ -137,7 +119,7 @@ console.error("Erro navegar:",err)
 
 function abrirPaginaInterna(url){
 
-if(!abaAtual || !abaAtual.webview) return
+if(!window.abaAtual || !window.abaAtual.webview) return
 
 let pagina = ""
 
@@ -186,7 +168,9 @@ pagina = `
 
 }
 
-abaAtual.webview.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(pagina))
+window.abaAtual.webview.loadURL(
+"data:text/html;charset=utf-8," + encodeURIComponent(pagina)
+)
 
 }
 
@@ -197,16 +181,14 @@ abaAtual.webview.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(pa
 
 function atualizarBarra(){
 
-if(!abaAtual || !abaAtual.webview) return
+if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
-
-urlBar.value = abaAtual.webview.getURL()
-
+if(urlBar){
+urlBar.value = window.abaAtual.webview.getURL()
+}
 }catch(e){
-
 console.warn("Erro atualizar barra")
-
 }
 
 }
@@ -218,18 +200,14 @@ console.warn("Erro atualizar barra")
 
 function voltar(){
 
-if(!abaAtual?.webview) return
+if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
-
-if(abaAtual.webview.canGoBack()){
-abaAtual.webview.goBack()
+if(window.abaAtual.webview.canGoBack()){
+window.abaAtual.webview.goBack()
 }
-
 }catch(e){
-
 console.warn("Erro voltar")
-
 }
 
 }
@@ -241,18 +219,14 @@ console.warn("Erro voltar")
 
 function avancar(){
 
-if(!abaAtual?.webview) return
+if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
-
-if(abaAtual.webview.canGoForward()){
-abaAtual.webview.goForward()
+if(window.abaAtual.webview.canGoForward()){
+window.abaAtual.webview.goForward()
 }
-
 }catch(e){
-
 console.warn("Erro avançar")
-
 }
 
 }
@@ -264,16 +238,12 @@ console.warn("Erro avançar")
 
 function recarregar(){
 
-if(!abaAtual?.webview) return
+if(!window.abaAtual || !window.abaAtual.webview) return
 
 try{
-
-abaAtual.webview.reload()
-
+window.abaAtual.webview.reload()
 }catch(e){
-
 console.warn("Erro reload")
-
 }
 
 }
@@ -287,109 +257,77 @@ document.addEventListener("keydown",(e)=>{
 
 
 // CTRL + L
-
 if(e.ctrlKey && e.key === "l"){
-
 e.preventDefault()
-
-urlBar.focus()
-urlBar.select()
-
+urlBar && urlBar.focus()
+urlBar && urlBar.select()
 }
 
 
 // CTRL + T
-
 if(e.ctrlKey && e.key === "t"){
-
 e.preventDefault()
-
+if(typeof novaAba === "function"){
 novaAba("https://www.google.com")
-
+}
 }
 
 
 // CTRL + W
-
 if(e.ctrlKey && e.key === "w"){
-
 e.preventDefault()
-
-if(abaAtual){
-fecharAba(abaAtual.id)
+if(window.abaAtual && typeof fecharAba === "function"){
+fecharAba(window.abaAtual.id)
 }
-
 }
 
 
 // CTRL + R
-
 if(e.ctrlKey && e.key === "r"){
-
 e.preventDefault()
-
 recarregar()
-
 }
 
 
 // CTRL + H
-
 if(e.ctrlKey && e.key === "h"){
-
 e.preventDefault()
-
 urlBar.value = "nexus://history"
 navegar()
-
 }
 
 
 // CTRL + D
-
 if(e.ctrlKey && e.key === "d"){
-
 e.preventDefault()
-
 urlBar.value = "nexus://favorites"
 navegar()
-
 }
 
 
 // CTRL + J
-
 if(e.ctrlKey && e.key === "j"){
-
 e.preventDefault()
-
 urlBar.value = "nexus://downloads"
 navegar()
-
 }
 
 
 // CTRL + ,
-
 if(e.ctrlKey && e.key === ","){
-
 e.preventDefault()
-
 urlBar.value = "nexus://settings"
 navegar()
-
 }
 
 
 // ALT ←
-
 if(e.altKey && e.key === "ArrowLeft"){
 voltar()
 }
 
 
 // ALT →
-
 if(e.altKey && e.key === "ArrowRight"){
 avancar()
 }
