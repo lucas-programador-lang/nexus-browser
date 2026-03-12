@@ -1,13 +1,50 @@
-const { app, BrowserWindow, shell, session, dialog } = require("electron")
+const { app, BrowserWindow, shell, session, dialog, ipcMain } = require("electron")
 const path = require("path")
+const fs = require("fs")
 
 // bloqueador de anúncios
 const enableAdBlock = require("./security/adblock")
 
 let mainWindow
 
-// histórico simples em memória
+// caminhos de dados
+const dataPath = app.getPath("userData")
+const historyFile = path.join(dataPath,"history.json")
+const favFile = path.join(dataPath,"favorites.json")
+
 let historico = []
+let favoritos = []
+
+// carregar arquivos salvos
+function carregarDados(){
+
+try{
+if(fs.existsSync(historyFile)){
+historico = JSON.parse(fs.readFileSync(historyFile))
+}
+}catch(e){
+historico=[]
+}
+
+try{
+if(fs.existsSync(favFile)){
+favoritos = JSON.parse(fs.readFileSync(favFile))
+}
+}catch(e){
+favoritos=[]
+}
+
+}
+
+// salvar histórico
+function salvarHistorico(){
+fs.writeFileSync(historyFile,JSON.stringify(historico,null,2))
+}
+
+// salvar favoritos
+function salvarFavoritos(){
+fs.writeFileSync(favFile,JSON.stringify(favoritos,null,2))
+}
 
 
 // =======================================
@@ -38,9 +75,7 @@ webviewTag:true
 
 mainWindow.loadFile("index.html")
 
-
-// abrir links externos no navegador do sistema
-
+// links externos
 mainWindow.webContents.setWindowOpenHandler(({ url }) => {
 
 shell.openExternal(url)
@@ -49,38 +84,11 @@ return { action:"deny" }
 
 })
 
-
-// remover menu padrão
-
 mainWindow.setMenu(null)
 
-
-// garantir zoom padrão
-
 mainWindow.webContents.on("did-finish-load",()=>{
-
 mainWindow.webContents.setZoomFactor(1)
-
 })
-
-}
-
-
-// =======================================
-// INICIAR APP
-// =======================================
-
-app.whenReady().then(()=>{
-
-// iniciar adblock
-
-try{
-
-enableAdBlock()
-
-}catch(err){
-
-console.error("Erro ao iniciar AdBlock:",err)
 
 }
 
@@ -89,35 +97,27 @@ console.error("Erro ao iniciar AdBlock:",err)
 // DOWNLOAD MANAGER
 // =======================================
 
+function iniciarDownloads(){
+
 session.defaultSession.on("will-download",(event,item)=>{
 
-const url = item.getURL()
 const fileName = item.getFilename()
+const url = item.getURL()
 
 console.log("Download iniciado:",fileName)
 
-
-// bloquear arquivos perigosos
-
-if(
-url.endsWith(".bat") ||
-url.endsWith(".cmd") ||
-url.endsWith(".ps1")
-){
+// bloquear scripts perigosos
+if(url.endsWith(".bat") || url.endsWith(".cmd") || url.endsWith(".ps1")){
 
 event.preventDefault()
 
 dialog.showErrorBox(
 "Download bloqueado",
-"Este tipo de arquivo pode ser perigoso."
+"Arquivo potencialmente perigoso."
 )
 
 return
-
 }
-
-
-// progresso download
 
 item.on("updated",(event,state)=>{
 
@@ -126,26 +126,19 @@ if(state === "progressing"){
 const percent =
 Math.round((item.getReceivedBytes()/item.getTotalBytes())*100)
 
-console.log("Download:",percent+"%")
+mainWindow.webContents.send("download-progress",percent)
 
 }
 
 })
-
-
-// download finalizado
 
 item.once("done",(event,state)=>{
 
 if(state === "completed"){
 
-console.log("Download concluído")
-
 shell.showItemInFolder(item.getSavePath())
 
-}else{
-
-console.log("Download cancelado")
+mainWindow.webContents.send("download-complete",fileName)
 
 }
 
@@ -153,10 +146,14 @@ console.log("Download cancelado")
 
 })
 
+}
+
 
 // =======================================
-// HISTÓRICO DE NAVEGAÇÃO
+// HISTÓRICO
 // =======================================
+
+function iniciarHistorico(){
 
 app.on("web-contents-created",(event,contents)=>{
 
@@ -167,26 +164,61 @@ url:url,
 data:new Date()
 })
 
-
-// limitar histórico
-
-if(historico.length > 500){
+if(historico.length>500){
 historico.shift()
 }
 
-})
+salvarHistorico()
 
 })
 
+})
+
+}
+
+
+// =======================================
+// IPC FAVORITOS
+// =======================================
+
+ipcMain.handle("get-favorites",()=>{
+return favoritos
+})
+
+ipcMain.handle("add-favorite",(event,data)=>{
+
+favoritos.push(data)
+salvarFavoritos()
+
+})
+
+ipcMain.handle("get-history",()=>{
+return historico
+})
+
+
+// =======================================
+// INICIAR APP
+// =======================================
+
+app.whenReady().then(()=>{
+
+carregarDados()
+
+try{
+enableAdBlock()
+}catch(e){
+console.log("Adblock não iniciado")
+}
+
+iniciarDownloads()
+iniciarHistorico()
 
 createWindow()
 
-
-// macOS comportamento padrão
-
 app.on("activate",()=>{
 
-if(BrowserWindow.getAllWindows().length === 0){
+if(BrowserWindow.getAllWindows().length===0){
 createWindow()
 }
 
@@ -201,7 +233,7 @@ createWindow()
 
 app.on("window-all-closed",()=>{
 
-if(process.platform !== "darwin"){
+if(process.platform!=="darwin"){
 app.quit()
 }
 
