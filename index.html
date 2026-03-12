@@ -80,7 +80,6 @@ autocomplete="off"
 <!-- ABAS -->
 <div id="tabs"></div>
 
-
 <!-- NAVEGADOR -->
 <div id="browser-container"></div>
 
@@ -94,6 +93,10 @@ autocomplete="off"
 <div class="menu-item" id="menuDownloads">Downloads</div>
 <div class="menu-item" id="menuFavoritos">Favoritos</div>
 <div class="menu-item" id="menuConfiguracoes">Configurações</div>
+
+<!-- NOVO BOTÃO -->
+<div class="menu-item" id="menuUpdate">Atualizar navegador</div>
+
 <div class="menu-item" id="menuAjuda">Ajuda</div>
 
 </div>
@@ -170,6 +173,12 @@ urlBar.value = "nexus://settings"
 navegar()
 }
 
+// ATUALIZAÇÃO DO NAVEGADOR
+document.getElementById("menuUpdate").onclick = ()=>{
+window.nexusAPI.send("check-update")
+}
+
+// ajuda
 document.getElementById("menuAjuda").onclick = ()=>{
 urlBar.value = "https://www.google.com/search?q=Nexus+Browser+ajuda"
 navegar()
