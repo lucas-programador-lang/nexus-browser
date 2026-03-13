@@ -1,18 +1,18 @@
 # Nexus Browser
 
-Nexus Browser é um navegador experimental baseado em Electron.
+Navegador web experimental desenvolvido em JavaScript para estudo de interfaces e navegação.
 
-Recursos planejados:
+## Tecnologias
 
-- IA integrada
-- detector de golpes
-- modo estudo
-- organização automática de abas
-- bloqueador de anúncios
-- mapa visual da internet
+- JavaScript
+- HTML
+- CSS
 
-Tecnologia:
+## Objetivo
 
-Electron + Chromium
+Projeto criado para praticar desenvolvimento web e entender o funcionamento de aplicações no navegador.
 
-Projeto educacional.
+## Autor
+
+José Lucas Lopes Sabino  
+https://github.com/lucas-programador-lang
