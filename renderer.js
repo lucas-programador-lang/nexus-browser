@@ -1,325 +1,194 @@
 // =======================================
-// CACHE DOM
+// CACHE DOM & ESTADO
 // =======================================
-
-let urlBar = null
-let btnVoltar = null
-let btnAvancar = null
-let btnRecarregar = null
-let btnIr = null
-let btnIA = null
-let btnEstudo = null
-
+const DOM = {
+    urlBar: null,
+    btnVoltar: null,
+    btnAvancar: null,
+    btnRecarregar: null,
+    btnIr: null,
+    btnIA: null,
+    btnEstudo: null,
+    containerAbas: null // Onde os webviews ficam
+};
 
 // =======================================
-// INICIAR
+// INICIALIZAÇÃO
 // =======================================
-
 window.addEventListener("DOMContentLoaded", () => {
+    // Mapeamento do DOM
+    DOM.urlBar = document.getElementById("url");
+    DOM.btnVoltar = document.getElementById("btnVoltar");
+    DOM.btnAvancar = document.getElementById("btnAvancar");
+    DOM.btnRecarregar = document.getElementById("btnRecarregar");
+    DOM.btnIr = document.getElementById("btnIr");
+    DOM.btnIA = document.getElementById("btnIA");
+    DOM.btnEstudo = document.getElementById("btnEstudo");
 
-urlBar = document.getElementById("url")
-btnVoltar = document.getElementById("btnVoltar")
-btnAvancar = document.getElementById("btnAvancar")
-btnRecarregar = document.getElementById("btnRecarregar")
-btnIr = document.getElementById("btnIr")
-btnIA = document.getElementById("btnIA")
-btnEstudo = document.getElementById("btnEstudo")
+    // Eventos de Input
+    if (DOM.urlBar) {
+        DOM.urlBar.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") navegar();
+        });
+        // Auto-selecionar texto ao clicar na barra
+        DOM.urlBar.addEventListener("click", () => DOM.urlBar.select());
+    }
 
-// ENTER na barra
-if(urlBar){
-urlBar.addEventListener("keydown",(e)=>{
-if(e.key === "Enter"){
-navegar()
-}
-})
-}
+    // Eventos de Botões
+    if (DOM.btnVoltar) DOM.btnVoltar.onclick = voltar;
+    if (DOM.btnAvancar) DOM.btnAvancar.onclick = avancar;
+    if (DOM.btnRecarregar) DOM.btnRecarregar.onclick = recarregar;
+    if (DOM.btnIr) DOM.btnIr.onclick = navegar;
 
-// BOTÕES
-if(btnVoltar) btnVoltar.onclick = voltar
-if(btnAvancar) btnAvancar.onclick = avancar
-if(btnRecarregar) btnRecarregar.onclick = recarregar
-if(btnIr) btnIr.onclick = navegar
+    // IA e Modo Estudo (Verificação de existência das funções)
+    if (DOM.btnIA) DOM.btnIA.onclick = () => (typeof abrirIA === "function") && abrirIA();
+    if (DOM.btnEstudo) DOM.btnEstudo.onclick = () => (typeof modoEstudo === "function") && modoEstudo();
 
-// IA
-if(btnIA){
-btnIA.onclick = ()=>{
-if(typeof abrirIA === "function"){
-abrirIA()
-}
-}
-}
-
-// MODO ESTUDO
-if(btnEstudo){
-btnEstudo.onclick = ()=>{
-if(typeof modoEstudo === "function"){
-modoEstudo()
-}
-}
-}
-
-})
-
+    console.log("🚀 Interface Nexus Renderer carregada.");
+});
 
 // =======================================
-// NAVEGAR
+// LÓGICA DE NAVEGAÇÃO
 // =======================================
+function navegar() {
+    if (!DOM.urlBar) return;
 
-function navegar(){
+    let urlInput = DOM.urlBar.value.trim();
+    if (!urlInput) return;
 
-if(!urlBar) return
+    // 1. Tratar Protocolo Interno
+    if (urlInput.startsWith("nexus://")) {
+        renderizarPaginaInterna(urlInput);
+        return;
+    }
 
-let urlInput = urlBar.value.trim()
+    // 2. Tratar busca ou URL direta
+    let finalUrl = urlInput;
+    const isUrl = urlInput.includes(".") && !urlInput.includes(" ");
 
-if(!urlInput) return
+    if (!isUrl) {
+        // Se não for URL, pesquisa no Google
+        finalUrl = `https://www.google.com/search?q=${encodeURIComponent(urlInput)}`;
+    } else {
+        // Se for URL mas faltar o protocolo
+        if (!/^https?:\/\//i.test(urlInput)) {
+            finalUrl = `https://${urlInput}`;
+        }
+    }
 
-// PÁGINAS INTERNAS
-if(urlInput.startsWith("nexus://")){
-abrirPaginaInterna(urlInput)
-return
+    // 3. Executar carga no WebView da aba ativa
+    const webview = getActiveWebview();
+    if (webview) {
+        webview.loadURL(finalUrl);
+        // Registrar no histórico via IPC (Preload)
+        window.nexus.registerHistory({ url: finalUrl, title: "Carregando..." });
+    } else {
+        console.error("Nenhum WebView ativo encontrado.");
+    }
 }
-
-// PESQUISA GOOGLE
-if(!urlInput.includes(".")){
-urlInput = "https://www.google.com/search?q=" + encodeURIComponent(urlInput)
-}
-
-// HTTPS AUTOMÁTICO
-if(!urlInput.startsWith("http://") && !urlInput.startsWith("https://")){
-urlInput = "https://" + urlInput
-}
-
-// SEGURANÇA
-if(typeof verificarSite === "function"){
-verificarSite(urlInput)
-}
-
-// VERIFICAR ABA
-if(!window.abaAtual || !window.abaAtual.webview){
-console.warn("Nenhuma aba ativa")
-return
-}
-
-try{
-window.abaAtual.webview.loadURL(urlInput)
-}catch(err){
-console.error("Erro navegar:",err)
-}
-
-}
-
 
 // =======================================
-// PÁGINAS INTERNAS
+// PÁGINAS INTERNAS (SISTEMA DE TEMPLATES)
 // =======================================
+async function renderizarPaginaInterna(protocolo) {
+    const webview = getActiveWebview();
+    if (!webview) return;
 
-async function abrirPaginaInterna(url){
+    let config = { title: "Nexus", content: "" };
 
-if(!window.abaAtual || !window.abaAtual.webview) return
+    try {
+        if (protocolo === "nexus://history") {
+            const data = await window.nexus.getHistory();
+            config.title = "Histórico de Navegação";
+            config.content = data.reverse().map(h => `
+                <div class="item">
+                    <span class="date">${h.date || ''}</span>
+                    <a href="#" onclick="window.location.href='${h.url}'">${h.url}</a>
+                </div>
+            `).join("") || "Nenhum registro.";
+        } 
+        else if (protocolo === "nexus://favorites") {
+            const data = await window.nexus.getFavorites();
+            config.title = "Meus Favoritos";
+            config.content = data.map(f => `
+                <div class="item">
+                    <strong>${f.title || 'Sem título'}</strong><br>
+                    <a href="#" onclick="window.location.href='${f.url}'">${f.url}</a>
+                </div>
+            `).join("") || "Sua lista está vazia.";
+        }
+        else if (protocolo === "nexus://settings") {
+            config.title = "Configurações";
+            config.content = `
+                <p>Gerencie as preferências do seu navegador.</p>
+                <button class="btn" onclick="window.nexus.checkUpdate()">Verificar Atualizações</button>
+            `;
+        }
+    } catch (err) {
+        config.content = `<p style="color:red">Erro ao carregar dados: ${err.message}</p>`;
+    }
 
-let titulo = ""
-let conteudo = ""
+    const html = `
+        <html>
+        <head>
+            <style>
+                body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; padding: 50px; }
+                .card { background: #1e293b; padding: 25px; border-radius: 12px; border: 1px solid #334155; }
+                h1 { color: #60a5fa; margin-top: 0; }
+                .item { padding: 10px 0; border-bottom: 1px solid #334155; }
+                .date { font-size: 11px; color: #94a3b8; display: block; }
+                a { color: #38bdf8; text-decoration: none; font-size: 14px; }
+                a:hover { text-decoration: underline; }
+                .btn { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h1>${config.title}</h1>
+                ${config.content}
+            </div>
+        </body>
+        </html>
+    `;
 
-if(url === "nexus://history"){
-
-titulo = "Histórico"
-
-try{
-
-const history = await window.nexus.getHistory()
-
-conteudo = history.map(h => `
-<div style="margin-bottom:10px">
-<a href="${h.url}" style="color:#60a5fa">${h.url}</a>
-</div>
-`).join("") || "Nenhum histórico ainda."
-
-}catch{
-conteudo = "Erro ao carregar histórico."
+    webview.loadURL("data:text/html;charset=utf-8," + encodeURIComponent(html));
+    if (DOM.urlBar) DOM.urlBar.value = protocolo;
 }
-
-}
-
-
-else if(url === "nexus://downloads"){
-
-titulo = "Downloads"
-
-conteudo = "Downloads aparecerão aqui quando você baixar arquivos."
-
-}
-
-
-else if(url === "nexus://favorites"){
-
-titulo = "Favoritos"
-
-try{
-
-const favs = await window.nexus.getFavorites()
-
-conteudo = favs.map(f => `
-<div style="margin-bottom:10px">
-<a href="${f.url}" style="color:#60a5fa">${f.title || f.url}</a>
-</div>
-`).join("") || "Nenhum favorito salvo."
-
-}catch{
-conteudo = "Erro ao carregar favoritos."
-}
-
-}
-
-
-else if(url === "nexus://settings"){
-
-titulo = "Configurações"
-
-conteudo = `
-<button onclick="window.nexusAPI.send('check-update')">
-Verificar atualização do navegador
-</button>
-`
-
-}
-
-
-else{
-
-titulo = "Nexus Browser"
-conteudo = "Página não encontrada."
-
-}
-
-
-const pagina = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-
-<style>
-
-body{
-font-family:Segoe UI;
-background:#0f172a;
-color:white;
-margin:0;
-padding:40px;
-}
-
-.card{
-background:#1e293b;
-padding:20px;
-border-radius:10px;
-margin-top:20px;
-}
-
-a{
-color:#60a5fa;
-text-decoration:none;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<h1>${titulo}</h1>
-
-<div class="card">
-${conteudo}
-</div>
-
-</body>
-</html>
-`
-
-window.abaAtual.webview.loadURL(
-"data:text/html;charset=utf-8," + encodeURIComponent(pagina)
-)
-
-}
-
 
 // =======================================
-// ATUALIZAR BARRA
+// UTILITÁRIOS DE NAVEGAÇÃO
 // =======================================
 
-function atualizarBarra(){
-
-if(!window.abaAtual || !window.abaAtual.webview) return
-
-try{
-
-if(urlBar){
-
-const url = window.abaAtual.webview.getURL()
-
-if(url.startsWith("data:text/html")) return
-
-urlBar.value = url
-
+function getActiveWebview() {
+    // Se você estiver usando o objeto window.abaAtual definido em outro script (como tabs.js)
+    if (window.abaAtual && window.abaAtual.webview) {
+        return window.abaAtual.webview;
+    }
+    // Fallback: busca o primeiro webview visível no documento
+    return document.querySelector("webview.active") || document.querySelector("webview");
 }
 
-}catch(e){
-console.warn("Erro atualizar barra")
+function voltar() {
+    const wv = getActiveWebview();
+    if (wv && wv.canGoBack()) wv.goBack();
 }
 
+function avancar() {
+    const wv = getActiveWebview();
+    if (wv && wv.canGoForward()) wv.goForward();
 }
 
-
-// =======================================
-// VOLTAR
-// =======================================
-
-function voltar(){
-
-if(!window.abaAtual || !window.abaAtual.webview) return
-
-try{
-if(window.abaAtual.webview.canGoBack()){
-window.abaAtual.webview.goBack()
-}
-}catch(e){
-console.warn("Erro voltar")
+function recarregar() {
+    const wv = getActiveWebview();
+    if (wv) wv.reload();
 }
 
-}
-
-
-// =======================================
-// AVANÇAR
-// =======================================
-
-function avancar(){
-
-if(!window.abaAtual || !window.abaAtual.webview) return
-
-try{
-if(window.abaAtual.webview.canGoForward()){
-window.abaAtual.webview.goForward()
-}
-}catch(e){
-console.warn("Erro avançar")
-}
-
-}
-
-
-// =======================================
-// RECARREGAR
-// =======================================
-
-function recarregar(){
-
-if(!window.abaAtual || !window.abaAtual.webview) return
-
-try{
-window.abaAtual.webview.reload()
-}catch(e){
-console.warn("Erro reload")
-}
-
+// Escuta atualizações de URL vindas do WebView para atualizar a barra
+// Nota: Isso deve ser configurado quando a aba é criada
+function vincularEventosWebview(webview) {
+    webview.addEventListener('did-navigate', (e) => {
+        if (DOM.urlBar && !e.url.startsWith('data:')) {
+            DOM.urlBar.value = e.url;
+        }
+    });
 }
