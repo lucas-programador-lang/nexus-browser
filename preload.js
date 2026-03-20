@@ -1,110 +1,58 @@
-const { contextBridge, ipcRenderer } = require("electron")
+const { contextBridge, ipcRenderer } = require("electron");
 
 // =======================================
-// INICIAR NAVEGADOR
+// SEGURANÇA: VERIFICAÇÃO DE ORIGEM
+// =======================================
+// Isso impede que sites externos (como google.com) tentem acessar 
+// as funções internas do seu navegador pelo console.
+const IS_INTERNAL = window.location.protocol === 'file:';
+
+// =======================================
+// API DO NAVEGADOR (NEXUS BRIDGE)
+// =======================================
+
+// Somente expõe a API se estivermos nas páginas internas do navegador
+if (IS_INTERNAL) {
+    contextBridge.exposeInMainWorld("nexus", {
+        
+        // --- HISTÓRICO E FAVORITOS ---
+        getHistory: () => ipcRenderer.invoke("get-history"),
+        getFavorites: () => ipcRenderer.invoke("get-favorites"),
+        addFavorite: (data) => ipcRenderer.invoke("add-favorite", data),
+
+        // --- NAVEGAÇÃO E SISTEMA ---
+        // Nova função para registrar o histórico vindo do renderer (UI)
+        registerHistory: (data) => ipcRenderer.send("register-history", data),
+        
+        checkUpdate: () => ipcRenderer.send("check-update"),
+
+        // --- CONFIGURAÇÕES E IA ---
+        getSettings: () => ipcRenderer.invoke("get-settings"),
+        saveSettings: (data) => ipcRenderer.invoke("save-settings", data),
+        askAI: (prompt) => ipcRenderer.invoke("ask-ai", prompt),
+
+        // --- EVENTOS DE DOWNLOAD (OTIMIZADOS) ---
+        // Usamos um padrão de "limpeza" para evitar vazamento de memória
+        onDownloadProgress: (callback) => {
+            const subscription = (event, data) => callback(data);
+            ipcRenderer.on("download-progress", subscription);
+            return () => ipcRenderer.removeListener("download-progress", subscription);
+        },
+
+        onDownloadComplete: (callback) => {
+            const subscription = (event, fileName) => callback(fileName);
+            ipcRenderer.on("download-complete", subscription);
+            return () => ipcRenderer.removeListener("download-complete", subscription);
+        }
+    });
+}
+
+// =======================================
+// INICIALIZAÇÃO
 // =======================================
 
 window.addEventListener("DOMContentLoaded", () => {
-console.log("🚀 Nexus Browser iniciado")
-})
-
-
-// =======================================
-// CANAIS PERMITIDOS (SEGURANÇA)
-// =======================================
-
-const validSendChannels = [
-"check-update"
-]
-
-const validReceiveChannels = [
-"download-progress",
-"download-complete"
-]
-
-const validInvokeChannels = [
-"get-history",
-"get-favorites",
-"add-favorite",
-"get-settings",
-"save-settings",
-"ask-ai"
-]
-
-
-// =======================================
-// API DO NAVEGADOR
-// =======================================
-
-contextBridge.exposeInMainWorld("nexus", {
-
-
-// ===============================
-// HISTÓRICO
-// ===============================
-
-getHistory: () => ipcRenderer.invoke("get-history"),
-
-
-// ===============================
-// FAVORITOS
-// ===============================
-
-getFavorites: () => ipcRenderer.invoke("get-favorites"),
-
-addFavorite: (data) => ipcRenderer.invoke("add-favorite", data),
-
-
-// ===============================
-// CONFIGURAÇÕES
-// ===============================
-
-getSettings: () => ipcRenderer.invoke("get-settings"),
-
-saveSettings: (data) => ipcRenderer.invoke("save-settings", data),
-
-
-// ===============================
-// IA DO NAVEGADOR
-// ===============================
-
-askAI: (prompt) => ipcRenderer.invoke("ask-ai", prompt),
-
-
-// ===============================
-// DOWNLOAD PROGRESS
-// ===============================
-
-onDownloadProgress: (callback) => {
-
-ipcRenderer.removeAllListeners("download-progress")
-
-ipcRenderer.on("download-progress",(event,percent)=>{
-callback(percent)
-})
-
-},
-
-
-// ===============================
-// DOWNLOAD COMPLETO
-// ===============================
-
-onDownloadComplete: (callback) => {
-
-ipcRenderer.removeAllListeners("download-complete")
-
-ipcRenderer.on("download-complete",(event,file)=>{
-callback(file)
-})
-
-},
-
-
-// ===============================
-// ATUALIZAÇÃO
-// ===============================
-
-checkUpdate: () => ipcRenderer.send("check-update")
-
-})
+    if (IS_INTERNAL) {
+        console.log("🚀 Nexus Bridge: Protegida e Ativa");
+    }
+});
