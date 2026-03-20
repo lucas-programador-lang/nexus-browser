@@ -2,257 +2,154 @@
 <html lang="pt-BR">
 
 <head>
-
-<meta charset="UTF-8">
-<title>Nexus Browser</title>
-
-<link rel="stylesheet" href="style.css">
-<link rel="icon" href="assets/logo.png">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Browser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/logo.png">
 </head>
 
 <body>
 
-<!-- LOGO -->
-<img src="assets/logo.png" id="logo">
-
-
-<!-- =============================== -->
-<!-- BARRA SUPERIOR -->
-<!-- =============================== -->
-
-<div class="topbar">
-
-<!-- CONTROLES -->
-
-<div class="nav-controls">
-
-<button id="btnVoltar" title="Voltar">
-<img src="assets/icons/back.svg">
-</button>
-
-<button id="btnAvancar" title="Avançar">
-<img src="assets/icons/forward.svg">
-</button>
-
-<button id="btnRecarregar" title="Recarregar">
-<img src="assets/icons/reload.svg">
-</button>
-
-</div>
-
-
-<!-- BARRA URL -->
-
-<input
-id="url"
-type="text"
-placeholder="Pesquisar ou digitar URL"
-autocomplete="off"
-/>
-
-
-<!-- BOTÕES -->
-
-<div class="nav-buttons">
-
-<button id="btnIr" title="Ir">
-<img src="assets/icons/search.svg">
-</button>
-
-<button id="btnIA" title="Assistente IA">
-<img src="assets/icons/ai.svg">
-</button>
-
-<button id="btnEstudo" title="Modo Estudo">
-<img src="assets/icons/book.svg">
-</button>
-
-<button id="btnNovaAba" title="Nova Aba">
-<img src="assets/icons/plus.svg">
-</button>
-
-</div>
-
-
-<!-- MENU -->
-
-<div class="menu-area">
-
-<button id="btnMenu" title="Menu">
-<img src="assets/icons/menu.svg">
-</button>
-
-</div>
-
-</div>
-
-
-
-<!-- =============================== -->
-<!-- ABAS -->
-<!-- =============================== -->
-
-<div id="tabs"></div>
-
-
-
-<!-- =============================== -->
-<!-- NAVEGADOR -->
-<!-- =============================== -->
-
-<div id="browser-container"></div>
-
-
-
-<!-- =============================== -->
-<!-- MENU DROPDOWN -->
-<!-- =============================== -->
-
-<div id="menuDropdown" class="menu-dropdown">
-
-<div class="menu-item" id="menuNovaGuia">Nova guia</div>
-<div class="menu-item" id="menuNovaJanela">Nova janela</div>
-<div class="menu-item" id="menuHistorico">Histórico</div>
-<div class="menu-item" id="menuDownloads">Downloads</div>
-<div class="menu-item" id="menuFavoritos">Favoritos</div>
-<div class="menu-item" id="menuConfiguracoes">Configurações</div>
-<div class="menu-item" id="menuUpdate">Atualizar navegador</div>
-<div class="menu-item" id="menuAjuda">Ajuda</div>
-
-</div>
-
-
-
-<!-- =============================== -->
-<!-- SCRIPTS -->
-<!-- =============================== -->
-
-<script src="tabs.js"></script>
-<script src="renderer.js"></script>
-<script src="ai.js"></script>
-<script src="security.js"></script>
-
-
-<script>
-
-window.addEventListener("DOMContentLoaded", () => {
-
-const menu = document.getElementById("menuDropdown")
-const btnMenu = document.getElementById("btnMenu")
-const urlBar = document.getElementById("url")
-const btnNovaAba = document.getElementById("btnNovaAba")
-
-
-// ===============================
-// NOVA ABA
-// ===============================
-
-btnNovaAba?.addEventListener("click",()=>{
-
-if(typeof novaAba === "function"){
-novaAba("https://www.google.com")
-}
-
-})
-
-
-
-// ===============================
-// MENU
-// ===============================
-
-btnMenu?.addEventListener("click",(e)=>{
-
-e.stopPropagation()
-
-menu.style.display =
-menu.style.display === "block"
-? "none"
-: "block"
-
-})
-
-
-
-// ===============================
-// FECHAR MENU
-// ===============================
-
-document.addEventListener("click",(e)=>{
-
-if(!btnMenu?.contains(e.target) && !menu?.contains(e.target)){
-menu.style.display="none"
-}
-
-})
-
-
-
-// ===============================
-// AÇÕES DO MENU
-// ===============================
-
-document.getElementById("menuNovaGuia").onclick = ()=>{
-novaAba("https://www.google.com")
-}
-
-document.getElementById("menuNovaJanela").onclick = ()=>{
-novaAba("https://www.google.com")
-}
-
-document.getElementById("menuHistorico").onclick = ()=>{
-urlBar.value = "nexus://history"
-navegar()
-}
-
-document.getElementById("menuDownloads").onclick = ()=>{
-urlBar.value = "nexus://downloads"
-navegar()
-}
-
-document.getElementById("menuFavoritos").onclick = ()=>{
-urlBar.value = "nexus://favorites"
-navegar()
-}
-
-document.getElementById("menuConfiguracoes").onclick = ()=>{
-urlBar.value = "nexus://settings"
-navegar()
-}
-
-
-
-// ===============================
-// ATUALIZAR NAVEGADOR
-// ===============================
-
-document.getElementById("menuUpdate").onclick = ()=>{
-
-if(window.nexusAPI){
-window.nexusAPI.send("check-update")
-}
-
-}
-
-
-
-// ===============================
-// AJUDA
-// ===============================
-
-document.getElementById("menuAjuda").onclick = ()=>{
-
-urlBar.value =
-"https://www.google.com/search?q=Nexus+Browser+ajuda"
-
-navegar()
-
-}
-
-})
-
-</script>
+    <img src="assets/logo.png" id="logo" style="display: none;">
+
+    <header class="topbar">
+        
+        <div class="nav-controls">
+            <button id="btnVoltar" title="Voltar">
+                <img src="assets/icons/back.svg" alt="Voltar">
+            </button>
+            <button id="btnAvancar" title="Avançar">
+                <img src="assets/icons/forward.svg" alt="Avançar">
+            </button>
+            <button id="btnRecarregar" title="Recarregar">
+                <img src="assets/icons/reload.svg" alt="Recarregar">
+            </button>
+        </div>
+
+        <div class="url-wrapper">
+            <input 
+                id="url" 
+                type="text" 
+                placeholder="Pesquisar no Google ou digitar endereço" 
+                autocomplete="off" 
+                spellcheck="false"
+            />
+        </div>
+
+        <div class="nav-buttons">
+            <button id="btnIr" title="Ir para URL">
+                <img src="assets/icons/search.svg" alt="Ir">
+            </button>
+            <button id="btnIA" title="Assistente IA">
+                <img src="assets/icons/ai.svg" alt="IA">
+            </button>
+            <button id="btnEstudo" title="Modo Estudo">
+                <img src="assets/icons/book.svg" alt="Estudo">
+            </button>
+            <button id="btnNovaAba" title="Nova Aba">
+                <img src="assets/icons/plus.svg" alt="Nova Aba">
+            </button>
+        </div>
+
+        <div class="menu-area">
+            <button id="btnMenu" title="Menu">
+                <img src="assets/icons/menu.svg" alt="Menu">
+            </button>
+        </div>
+    </header>
+
+    <div id="tabs-container">
+        <div id="tabs"></div>
+    </div>
+
+    <main id="browser-container"></main>
+
+    <div id="menuDropdown" class="menu-dropdown">
+        <div class="menu-item" id="menuNovaGuia">Nova guia</div>
+        <div class="menu-item" id="menuNovaJanela">Nova janela</div>
+        <div class="separator"></div>
+        <div class="menu-item" id="menuHistorico">Histórico</div>
+        <div class="menu-item" id="menuDownloads">Downloads</div>
+        <div class="menu-item" id="menuFavoritos">Favoritos</div>
+        <div class="separator"></div>
+        <div class="menu-item" id="menuConfiguracoes">Configurações</div>
+        <div class="menu-item" id="menuUpdate">Verificar Atualizações</div>
+        <div class="menu-item" id="menuAjuda">Ajuda</div>
+    </div>
+
+    <script src="tabs.js"></script>
+    <script src="renderer.js"></script>
+    <script src="ai.js"></script>
+    <script src="security.js"></script>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const menu = document.getElementById("menuDropdown");
+            const btnMenu = document.getElementById("btnMenu");
+            const urlBar = document.getElementById("url");
+            const btnNovaAba = document.getElementById("btnNovaAba");
+
+            // --- LÓGICA DE INTERFACE ---
+
+            // Abrir/Fechar Menu
+            btnMenu?.addEventListener("click", (e) => {
+                e.stopPropagation();
+                const isVisible = menu.style.display === "block";
+                menu.style.display = isVisible ? "none" : "block";
+            });
+
+            // Fechar menu ao clicar fora
+            document.addEventListener("click", (e) => {
+                if (!menu.contains(e.target) && e.target !== btnMenu) {
+                    menu.style.display = "none";
+                }
+            });
+
+            // --- AÇÕES DO MENU E BOTÕES ---
+
+            const handleNavegarInterno = (path) => {
+                if (typeof navegar === "function") {
+                    urlBar.value = path;
+                    navegar(); // Função global no renderer.js
+                }
+                menu.style.display = "none";
+            };
+
+            const abrirNovaGuia = () => {
+                if (typeof novaAba === "function") {
+                    novaAba("https://www.google.com");
+                }
+                menu.style.display = "none";
+            };
+
+            btnNovaAba.onclick = abrirNovaGuia;
+            document.getElementById("menuNovaGuia").onclick = abrirNovaGuia;
+            
+            document.getElementById("menuHistorico").onclick = () => handleNavegarInterno("nexus://history");
+            document.getElementById("menuDownloads").onclick = () => handleNavegarInterno("nexus://downloads");
+            document.getElementById("menuFavoritos").onclick = () => handleNavegarInterno("nexus://favorites");
+            document.getElementById("menuConfiguracoes").onclick = () => handleNavegarInterno("nexus://settings");
+
+            document.getElementById("menuUpdate").onclick = () => {
+                if (window.nexus && window.nexus.checkUpdate) {
+                    window.nexus.checkUpdate();
+                }
+                menu.style.display = "none";
+            };
+
+            document.getElementById("menuAjuda").onclick = () => {
+                urlBar.value = "https://github.com"; // Ou sua página de ajuda
+                navegar();
+                menu.style.display = "none";
+            };
+
+            // Criar a primeira aba automaticamente ao iniciar
+            if (typeof novaAba === "function") {
+                novaAba("https://www.google.com");
+            }
+        });
+    </script>
 
 </body>
 </html>
