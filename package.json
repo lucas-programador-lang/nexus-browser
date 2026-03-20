@@ -4,42 +4,44 @@
   "description": "Nexus Browser - navegador com IA e segurança",
   "author": "Jose Lucas",
   "main": "main.js",
-
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "postinstall": "electron-builder install-app-deps"
   },
-
   "build": {
     "appId": "com.nexus.browser",
     "productName": "Nexus Browser",
-
     "directories": {
       "output": "dist"
     },
-
     "files": [
-      "**/*"
+      "**/*",
+      "!dist/*"
     ],
-
     "win": {
       "target": "nsis",
       "icon": "assets/logo.png"
     },
-
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
     "publish": {
       "provider": "github",
       "owner": "lucas-programador-lang",
       "repo": "nexus-browser"
     }
   },
-
   "devDependencies": {
     "electron": "^30.0.0",
     "electron-builder": "^24.13.3"
   },
-
   "dependencies": {
+    "@cliqz/adblocker-electron": "^1.26.0",
+    "cross-fetch": "^4.0.0",
+    "electron-log": "^5.0.0",
     "electron-updater": "^6.3.9"
   }
 }
