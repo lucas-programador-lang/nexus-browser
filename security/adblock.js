@@ -1,61 +1,72 @@
-const { session } = require("electron")
+const { session } = require("electron");
 
-// ===============================
-// LISTA DE DOMÍNIOS DE ANÚNCIOS
-// ===============================
+// =======================================
+// CONFIGURAÇÃO DO NEXUS SHIELD (ADBLOCK)
+// =======================================
 
-const blockedDomains = [
+// Lista expandida e organizada por categorias
+const blockedPatterns = [
+    // Redes de Anúncios Comuns
+    "doubleclick.net",
+    "googlesyndication.com",
+    "adservice.google.com",
+    "googletagmanager.com",
+    "google-analytics.com",
+    "analytics.google.com",
+    "ads.youtube.com",
+    "facebook.net",
+    "connect.facebook.net",
+    "ads-twitter.com",
+    "taboola.com",
+    "outbrain.com",
+    "adnxs.com",
+    "adsystem.com",
+    "casalemedia.com",
+    "rubiconproject.com",
+    "popads.net",
+    "ad-delivery.net",
+    
+    // Padrões de URL de anúncios
+    "/ads/",
+    "/advertisements/",
+    "/show_ads.",
+    "adsbygoogle",
+    "telemetry",
+    "tracking-pixel"
+];
 
-"doubleclick.net",
-"googlesyndication.com",
-"ads.youtube.com",
-"adservice.google.com",
-"googletagmanager.com",
-"google-analytics.com",
-"facebook.net",
-"ads-twitter.com",
-"taboola.com",
-"outbrain.com",
-"adsystem.com",
-"adnxs.com"
+// Transforma a lista em uma única Regex para performance máxima
+const blockRegex = new RegExp(blockedPatterns.join("|"), "i");
 
-]
+/**
+ * Ativa o bloqueador de anúncios na sessão padrão do Electron.
+ */
+function enableAdBlock() {
+    const filter = {
+        urls: ["http://*/*", "https://*/*"]
+    };
 
+    session.defaultSession.webRequest.onBeforeRequest(filter, (details, callback) => {
+        const url = details.url.toLowerCase();
 
-// ===============================
-// ATIVAR ADBLOCK
-// ===============================
+        // 1. Exceção: Não bloquear requisições internas do próprio navegador ou Google Auth
+        if (url.includes("accounts.google.com") || url.startsWith("file://")) {
+            return callback({ cancel: false });
+        }
 
-function enableAdBlock(){
+        // 2. Verificação de bloqueio via Regex
+        if (blockRegex.test(url)) {
+            // Log silencioso para não poluir o console do dev, 
+            // mas você pode reativar se quiser debugar.
+            // console.log("🚫 Nexus Shield bloqueou:", url.substring(0, 50) + "...");
+            return callback({ cancel: true });
+        }
 
-session.defaultSession.webRequest.onBeforeRequest(
+        // 3. Permitir o restante
+        callback({ cancel: false });
+    });
 
-(details, callback)=>{
-
-const url = details.url.toLowerCase()
-
-// bloquear domínios de anúncios
-if(blockedDomains.some(domain => url.includes(domain))){
-
-console.log("🚫 anúncio bloqueado:", url)
-
-return callback({ cancel:true })
-
+    console.log("🛡️ Nexus Shield AdBlock: Ativado e Monitorando.");
 }
 
-// bloquear scripts de ads comuns
-if(url.includes("/ads/") || url.includes("advert")){
-
-console.log("🚫 possível anúncio bloqueado:", url)
-
-return callback({ cancel:true })
-
-}
-
-callback({})
-
-})
-
-}
-
-module.exports = enableAdBlock
+module.exports = { enableAdBlock };
