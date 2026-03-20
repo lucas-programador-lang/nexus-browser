@@ -4,18 +4,21 @@ const fs = require("fs");
 const { autoUpdater } = require("electron-updater");
 const log = require("electron-log");
 
+// Importa seu AdBlock personalizado (opcional)
+// const { enableAdBlock } = require('./adblock.js'); 
+
 // CONFIGURAÇÃO DE LOGS
 log.transports.file.level = "info";
 autoUpdater.logger = log;
 
-// BLOQUEADOR DE ANÚNCIOS (Tentativa de carregamento)
+// BLOQUEADOR DE ANÚNCIOS (Tentativa de carregamento de biblioteca externa)
 let adBlockerInstance = null;
 try {
     const { ElectronBlocker } = require("@cliqz/adblocker-electron");
     const fetch = require("cross-fetch");
     adBlockerInstance = { ElectronBlocker, fetch };
 } catch (e) {
-    console.log("Adblocker module não instalado. Use: npm install @cliqz/adblocker-electron cross-fetch");
+    console.log("Dica: Use 'npm install @cliqz/adblocker-electron' para bloqueio avançado.");
 }
 
 // VARIÁVEIS GLOBAIS
@@ -41,15 +44,17 @@ function carregarDados() {
         }
     } catch (e) {
         console.error("Erro ao carregar dados:", e);
+        historico = [];
+        favoritos = [];
     }
 }
 
-// Debounce para salvar histórico (evita escrita excessiva no SSD/HD)
 let saveTimeout;
 function agendarSalvamentoHistorico() {
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
-        fs.writeFile(historyFile, JSON.stringify(historico.slice(-500), null, 2), (err) => {
+        const data = JSON.stringify(historico.slice(-500), null, 2);
+        fs.writeFile(historyFile, data, (err) => {
             if (err) console.error("Erro ao salvar histórico:", err);
         });
     }, 5000); 
@@ -64,26 +69,32 @@ function salvarFavoritos() {
 }
 
 // =======================================
-// CONFIGURAÇÃO DE SEGURANÇA E SESSÃO
+// SEGURANÇA E SESSÃO
 // =======================================
 
 async function setupSecurity(sess) {
-    // Ativar Adblocker se disponível
+    // 1. Ativar Adblocker Externo
     if (adBlockerInstance) {
-        const blocker = await adBlockerInstance.ElectronBlocker.fromPrebuiltAdsAndTracking(adBlockerInstance.fetch);
-        blocker.enableBlockingInSession(sess);
-        console.log("Adblock ativo na sessão.");
+        adBlockerInstance.ElectronBlocker.fromPrebuiltAdsAndTracking(adBlockerInstance.fetch).then(blocker => {
+            blocker.enableBlockingInSession(sess);
+            console.log("🛡️ Adblock Engine: Ativado.");
+        });
     }
 
-    // Gerenciar permissões (Geolocalização, Notificações, etc)
+    // 2. Gerenciar permissões
     sess.setPermissionRequestHandler((webContents, permission, callback) => {
-        const allowedPermissions = ["notifications", "fullscreen"]; 
-        if (allowedPermissions.includes(permission)) {
-            callback(true);
-        } else {
-            console.log(`Permissão negada automaticamente: ${permission}`);
-            callback(false);
-        }
+        const allowed = ["notifications", "fullscreen", "audioCapture"]; 
+        callback(allowed.includes(permission));
+    });
+
+    // 3. Headers de Segurança (Opcional: melhora privacidade)
+    sess.webRequest.onHeadersReceived((details, callback) => {
+        callback({
+            responseHeaders: {
+                ...details.responseHeaders,
+                'Content-Security-Policy': ["default-src * 'unsafe-inline' 'unsafe-eval' data: blob:"]
+            }
+        });
     });
 }
 
@@ -93,19 +104,19 @@ async function setupSecurity(sess) {
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 1400,
-        height: 900,
-        minWidth: 1000,
-        minHeight: 700,
-        backgroundColor: "#0f172a",
-        icon: path.join(__dirname, "assets/nexus.ico"),
-        show: false, // Só mostra quando estiver pronto (evita flash branco)
+        width: 1300,
+        height: 850,
+        minWidth: 900,
+        minHeight: 600,
+        title: "Nexus Browser",
+        backgroundColor: "#020617",
+        icon: path.join(__dirname, "assets/logo.png"),
+        show: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
             nodeIntegration: false,
             contextIsolation: true,
-            webviewTag: true,
-            devTools: true
+            webviewTag: true
         }
     });
 
@@ -114,76 +125,25 @@ function createWindow() {
 
     mainWindow.once("ready-to-show", () => {
         mainWindow.show();
+        // Se quiser abrir o DevTools automaticamente no início:
+        // mainWindow.webContents.openDevTools();
     });
 
-    // Abrir links externos com segurança
     mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-        if (url.startsWith("http")) {
-            shell.openExternal(url);
-        }
+        if (url.startsWith("http")) shell.openExternal(url);
         return { action: "deny" };
     });
 }
 
 // =======================================
-// DOWNLOAD MANAGER
-// =======================================
-
-function iniciarDownloads() {
-    session.defaultSession.on("will-download", (event, item) => {
-        const fileName = item.getFilename();
-        const url = item.getURL();
-        const ext = path.extname(fileName).toLowerCase();
-
-        // Bloqueio de arquivos perigosos
-        const dangerExts = [".bat", ".cmd", ".ps1", ".exe", ".msi", ".vbs"];
-        if (dangerExts.includes(ext)) {
-            const choice = dialog.showMessageBoxSync(mainWindow, {
-                type: "warning",
-                buttons: ["Cancelar", "Baixar assim mesmo"],
-                title: "Aviso de Segurança",
-                message: `O arquivo "${fileName}" pode ser perigoso. Deseja continuar?`,
-                defaultId: 0
-            });
-
-            if (choice === 0) {
-                event.preventDefault();
-                return;
-            }
-        }
-
-        item.on("updated", (event, state) => {
-            if (state === "progressing") {
-                const percent = item.getTotalBytes() > 0 
-                    ? Math.round((item.getReceivedBytes() / item.getTotalBytes()) * 100) 
-                    : -1;
-                
-                if (!mainWindow.isDestroyed()) {
-                    mainWindow.webContents.send("download-progress", { fileName, percent });
-                }
-            }
-        });
-
-        item.once("done", (event, state) => {
-            if (state === "completed" && !mainWindow.isDestroyed()) {
-                mainWindow.webContents.send("download-complete", fileName);
-                // Notificação nativa opcional
-                shell.beep();
-            }
-        });
-    });
-}
-
-// =======================================
-// IPC HANDLERS (Comunicação Renderer -> Main)
+// IPC HANDLERS
 // =======================================
 
 function setupIPC() {
+    // Favoritos
     ipcMain.handle("get-favorites", () => favoritos);
-    
     ipcMain.handle("add-favorite", (event, data) => {
-        const exists = favoritos.find(f => f.url === data.url);
-        if (!exists) {
+        if (!favoritos.find(f => f.url === data.url)) {
             favoritos.push(data);
             salvarFavoritos();
             return true;
@@ -191,24 +151,28 @@ function setupIPC() {
         return false;
     });
 
+    // Histórico
     ipcMain.handle("get-history", () => historico);
-
-    ipcMain.on("check-update", () => {
-        if (app.isPackaged) {
-            autoUpdater.checkForUpdatesAndNotify();
-        } else {
-            console.log("Modo desenvolvimento: Update ignorado.");
+    ipcMain.on("register-history", (event, data) => {
+        if (data.url.startsWith("http")) {
+            historico.push({
+                title: data.title || "Nova Aba",
+                url: data.url,
+                date: new Date().toLocaleTimeString()
+            });
+            agendarSalvamentoHistorico();
         }
     });
 
-    // Registrar navegação no histórico vindo do WebView (via Preload)
-    ipcMain.on("register-history", (event, data) => {
-        historico.push({
-            title: data.title || "Sem título",
-            url: data.url,
-            date: new Date().toLocaleString()
-        });
-        agendarSalvamentoHistorico();
+    // Atualizações
+    ipcMain.on("check-update", () => {
+        if (app.isPackaged) autoUpdater.checkForUpdatesAndNotify();
+    });
+
+    // IA - Mock de resposta (Aqui você conectaria com uma API real como Gemini/OpenAI)
+    ipcMain.handle("ask-ai", async (event, prompt) => {
+        // Exemplo simples de retorno:
+        return `O Nexus AI recebeu sua mensagem: "${prompt}". (Para respostas reais, configure sua chave de API no processo Main).`;
     });
 }
 
@@ -218,19 +182,23 @@ function setupIPC() {
 
 app.whenReady().then(async () => {
     carregarDados();
-    await setupSecurity(session.defaultSession);
-    iniciarDownloads();
     setupIPC();
-    createWindow();
-
-    // Auto-update apenas em produção
-    if (app.isPackaged) {
-        autoUpdater.checkForUpdatesAndNotify();
-    }
-
-    app.on("activate", () => {
-        if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    await setupSecurity(session.defaultSession);
+    
+    // Inicia downloads
+    session.defaultSession.on("will-download", (event, item) => {
+        const ext = path.extname(item.getFilename()).toLowerCase();
+        if ([".exe", ".bat", ".msi"].includes(ext)) {
+            const choice = dialog.showMessageBoxSync({
+                type: "warning",
+                message: "Este arquivo pode ser perigoso. Baixar?",
+                buttons: ["Cancelar", "Baixar"]
+            });
+            if (choice === 0) return event.preventDefault();
+        }
     });
+
+    createWindow();
 });
 
 app.on("window-all-closed", () => {
