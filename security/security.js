@@ -1,187 +1,140 @@
 // =======================================
-// SEGURANÇA DO NAVEGADOR
+// MÓDULO DE SEGURANÇA NEXUS (SHIELD)
 // =======================================
 
-// evita alertas repetidos
-let ultimoAviso = ""
+let ultimoAvisoSeguranca = "";
+let timeoutAviso = null;
 
+/**
+ * Verifica a URL antes da navegação para detectar riscos.
+ * @param {string} urlString 
+ */
+function verificarSite(urlString) {
+    if (!urlString) return;
 
-// =======================================
-// VERIFICAR SITE
-// =======================================
+    let url;
+    try {
+        // Normaliza a URL para análise
+        url = new URL(urlString.startsWith('http') ? urlString : `https://${urlString}`);
+    } catch (e) {
+        return; // URL inválida
+    }
 
-function verificarSite(url){
+    const hostname = url.hostname.toLowerCase();
+    const fullUrl = url.href.toLowerCase();
 
-if(!url) return
+    // 1. PALAVRAS DE GOLPE (SCAM KEYWORDS)
+    const palavrasGolpe = [
+        "free-money", "crypto-bonus", "win-money", "double-your-money",
+        "earn-fast", "giveaway", "claim-reward", "bitcoin-free",
+        "get-rich", "airdrop", "free-crypto", "lottery-win"
+    ];
 
-try{
+    // 2. ENCURTADORES (SITES DE REDIRECIONAMENTO)
+    const encurtadores = [
+        "bit.ly", "tinyurl.com", "cutt.ly", "t.co", "is.gd", 
+        "rebrand.ly", "tiny.cc", "ow.ly", "buff.ly"
+    ];
 
-url = url.toLowerCase()
+    // 3. PADRÕES DE PHISHING (DOMÍNIOS MASCARADOS)
+    const padroesPhishing = [
+        "login-secure", "verify-account", "update-wallet", 
+        "metamask-login", "pague-seguro", "caixa-atualiza",
+        "banco-seguranca", "netflix-payment"
+    ];
 
-}catch(e){
-return
+    // --- EXECUÇÃO DA CHECAGEM ---
+
+    // Alerta de HTTP Inseguro (Apenas se não for localhost)
+    if (url.protocol === "http:" && hostname !== "localhost") {
+        exibirAlertaSeguranca("🔓 Conexão insegura (HTTP). Não insira senhas neste site.", "warning");
+    }
+
+    // Alerta de Termos Suspeitos
+    if (palavrasGolpe.some(p => fullUrl.includes(p))) {
+        exibirAlertaSeguranca("⚠️ Conteúdo suspeito: Este site pode ser um golpe financeiro.", "danger");
+    }
+
+    // Alerta de Encurtadores
+    if (encurtadores.some(e => hostname.includes(e))) {
+        exibirAlertaSeguranca("🔗 Link encurtado: O destino real está oculto. Cuidado.", "info");
+    }
+
+    // Alerta de Phishing (Domínios falsos)
+    if (padroesPhishing.some(d => hostname.includes(d))) {
+        exibirAlertaSeguranca("🚨 Alerta de Phishing: Este site imita uma página oficial.", "danger");
+    }
+
+    // Verificação de Homógrafo (Ex: 'g00gle.com' em vez de 'google.com')
+    // Nota: Aqui você poderia expandir com uma lista de domínios reais conhecidos.
 }
 
+/**
+ * Renderiza um alerta visual elegante na interface.
+ */
+function exibirAlertaSeguranca(msg, tipo = "danger") {
+    // Evita spam de alertas idênticos
+    if (ultimoAvisoSeguranca === msg) return;
+    ultimoAvisoSeguranca = msg;
 
-// =======================================
-// PALAVRAS SUSPEITAS
-// =======================================
+    // Limpa timeout anterior se houver
+    if (timeoutAviso) clearTimeout(timeoutAviso);
 
-const palavrasSuspeitas = [
+    let alerta = document.getElementById("nexus-security-alert");
+    if (alerta) alerta.remove();
 
-"free-money",
-"bonus",
-"crypto-bonus",
-"win-money",
-"double-your-money",
-"earn-fast",
-"giveaway",
-"claim-reward",
-"bitcoin-free",
-"easy-profit",
-"instant-money",
-"get-rich",
-"airdrop",
-"free-crypto"
+    alerta = document.createElement("div");
+    alerta.id = "nexus-security-alert";
 
-]
+    // Cores baseadas no tipo
+    const cores = {
+        danger: "#ef4444",
+        warning: "#f59e0b",
+        info: "#3b82f6"
+    };
 
+    Object.assign(alerta.style, {
+        position: "fixed",
+        bottom: "20px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        background: cores[tipo] || "#1e293b",
+        color: "white",
+        padding: "12px 24px",
+        borderRadius: "30px",
+        fontSize: "13px",
+        fontWeight: "600",
+        zIndex: "100000",
+        boxShadow: "0 10px 25px rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        gap: "10px",
+        animation: "slideUp 0.3s ease-out"
+    });
 
-// =======================================
-// ENCURTADORES DE LINK
-// =======================================
+    // Adiciona animação ao CSS se não existir
+    if (!document.getElementById("security-anim")) {
+        const style = document.createElement("style");
+        style.id = "security-anim";
+        style.innerHTML = `
+            @keyframes slideUp {
+                from { transform: translate(-50%, 100%); opacity: 0; }
+                to { transform: translate(-50%, 0); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 
-const encurtadores = [
+    alerta.innerHTML = `<span>${msg}</span><button onclick="this.parentElement.remove()" style="background:none; border:none; color:white; cursor:pointer; font-weight:bold; margin-left:10px;">✕</button>`;
 
-"bit.ly",
-"tinyurl.com",
-"cutt.ly",
-"t.co",
-"is.gd",
-"shorturl",
-"rebrand.ly",
-"tiny.cc"
+    document.body.appendChild(alerta);
 
-]
-
-
-// =======================================
-// DOMÍNIOS SUSPEITOS
-// =======================================
-
-const dominiosPerigosos = [
-
-"login-secure",
-"verify-account",
-"account-verify",
-"update-wallet",
-"secure-wallet",
-"crypto-airdrop",
-"metamask-login",
-"wallet-update"
-
-]
-
-
-// =======================================
-// DETECÇÃO
-// =======================================
-
-const palavraPerigosa =
-palavrasSuspeitas.some(p => url.includes(p))
-
-const linkEncurtado =
-encurtadores.some(p => url.includes(p))
-
-const dominioFalso =
-dominiosPerigosos.some(p => url.includes(p))
-
-const httpInseguro =
-url.startsWith("http://")
-
-
-// =======================================
-// ALERTAS
-// =======================================
-
-if(palavraPerigosa){
-
-mostrarAlertaSeguranca(
-"⚠️ Este site contém termos frequentemente usados em golpes."
-)
-
-}
-
-
-if(linkEncurtado){
-
-mostrarAlertaSeguranca(
-"⚠️ Este link usa encurtador. Verifique o destino antes de acessar."
-)
-
-}
-
-
-if(dominioFalso){
-
-mostrarAlertaSeguranca(
-"🚨 Possível página de phishing detectada."
-)
-
-}
-
-
-if(httpInseguro){
-
-console.warn("Site sem HTTPS:", url)
-
-}
-
-}
-
-
-// =======================================
-// ALERTA VISUAL
-// =======================================
-
-function mostrarAlertaSeguranca(msg){
-
-// evita repetição
-
-if(ultimoAviso === msg) return
-
-ultimoAviso = msg
-
-
-let alerta = document.getElementById("alertaSeguranca")
-
-if(alerta) alerta.remove()
-
-
-alerta = document.createElement("div")
-
-alerta.id = "alertaSeguranca"
-
-alerta.style.position = "fixed"
-alerta.style.bottom = "20px"
-alerta.style.left = "20px"
-alerta.style.background = "#7f1d1d"
-alerta.style.color = "white"
-alerta.style.padding = "12px 16px"
-alerta.style.borderRadius = "8px"
-alerta.style.fontSize = "14px"
-alerta.style.zIndex = "99999"
-alerta.style.boxShadow = "0 6px 20px rgba(0,0,0,0.4)"
-
-alerta.innerText = msg
-
-document.body.appendChild(alerta)
-
-
-// remover automaticamente
-
-setTimeout(()=>{
-alerta.remove()
-},5000)
-
+    // Remove após 6 segundos
+    timeoutAviso = setTimeout(() => {
+        if (alerta) {
+            alerta.style.opacity = "0";
+            alerta.style.transition = "opacity 0.5s";
+            setTimeout(() => { alerta.remove(); ultimoAvisoSeguranca = ""; }, 500);
+        }
+    }, 6000);
 }
